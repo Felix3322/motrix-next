@@ -184,7 +184,7 @@ Follow this exact checklist:
 
 - SQL migration files live in `src-tauri/migrations/` with `NNN_description.sql` naming
 - Each migration is registered as a `tauri_plugin_sql::Migration` struct in the `.add_migrations()` call in `lib.rs`
-- The plugin tracks executed versions in an internal `_sqlite_migrations` table
+- The plugin tracks executed versions in an internal `_sqlx_migrations` table
 - Old users receive new migrations transparently on upgrade — no manual action needed
 
 ### Adding a New Migration
@@ -199,9 +199,12 @@ Follow this exact checklist:
        kind: tauri_plugin_sql::MigrationKind::Up,
    },
    ```
-3. If the migration adds/renames columns used by the frontend, update `HistoryRecord` in `src/shared/types.ts`
-4. Update relevant SQL queries in `src/stores/history.ts`
-5. Run `cargo check` to verify the Rust compiles
+3. Update `REGISTERED_VERSIONS` in `src-tauri/src/db_guard.rs`
+4. Update `CURRENT_DB_SCHEMA_VERSION` in `src/shared/constants.ts`
+5. If the migration adds/renames columns used by the frontend, update `HistoryRecord` in `src/shared/types.ts`
+6. Update relevant SQL queries in `src/stores/history.ts`
+7. Add a regression test that fresh installs persist the current DB schema version and do not show a false DB upgrade toast on second launch
+8. Run `cargo check` to verify the Rust compiles
 
 ### Rules
 
@@ -209,6 +212,7 @@ Follow this exact checklist:
 - Use `ALTER TABLE ... ADD COLUMN` with defaults for backward compatibility
 - Use `COALESCE` in queries to handle NULL values from old rows gracefully
 - Test with both a fresh DB AND an existing DB to verify both paths work
+- Never leave `DEFAULT_APP_CONFIG.dbSchemaVersion` behind the latest registered migration; first saved config on a fresh install must be stamped with the current DB schema version
 
 ### Toast Differentiation
 

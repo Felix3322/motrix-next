@@ -75,7 +75,7 @@ export const usePreferenceStore = defineStore('preference', () => {
         // Backfill dbSchemaVersion for existing users upgrading to a version
         // that includes this field. saved being non-empty proves this is NOT
         // a fresh install — fresh installs have empty config.json and take
-        // the DEFAULT_APP_CONFIG path (which already has dbSchemaVersion = 2).
+        // the DEFAULT_APP_CONFIG path (which already has the current DB version).
         if (saved.dbSchemaVersion === undefined) {
           saved.dbSchemaVersion = 1
         }

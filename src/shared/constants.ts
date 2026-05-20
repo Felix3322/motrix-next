@@ -193,9 +193,14 @@ export const MAX_FILE_CATEGORIES = 20
  *  on categories loaded from persisted config (which may lack the field). */
 export const BUILTIN_CATEGORY_LABELS: ReadonlySet<string> = new Set(BUILTIN_CATEGORY_TEMPLATES.map((t) => t.label))
 
+/** Latest registered SQLite migration version for history.db.
+ *  Keep this in sync with tauri_plugin_sql migrations in src-tauri/src/lib.rs
+ *  and REGISTERED_VERSIONS in src-tauri/src/db_guard.rs. */
+export const CURRENT_DB_SCHEMA_VERSION = 3
+
 export const DEFAULT_APP_CONFIG = {
   configVersion: 5,
-  dbSchemaVersion: 2,
+  dbSchemaVersion: CURRENT_DB_SCHEMA_VERSION,
   // ── Appearance ──────────────────────────────────────────────────
   theme: 'auto' as const,
   colorScheme: 'amber',

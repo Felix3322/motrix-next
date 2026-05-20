@@ -208,9 +208,9 @@ watch(
 
 // ── DB schema migration toast ───────────────────────────────────────
 // Uses the same reactive pattern as config migration toast above.
-// loadPreference() sets dbUpgradeVersion when it detects an existing user
-// whose config.json has no dbSchemaVersion field (backfilled to 1).
-// Fresh installs: DEFAULT_APP_CONFIG.dbSchemaVersion = 2 → no signal fired.
+// loadPreference() sets dbUpgradeVersion only for saved preferences.
+// Fresh installs use CURRENT_DB_SCHEMA_VERSION from DEFAULT_APP_CONFIG,
+// so their first persisted config does not trigger a false upgrade toast.
 watch(
   () => preferenceStore.dbUpgradeVersion,
   async (savedDbVersion) => {

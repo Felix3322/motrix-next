@@ -2,6 +2,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { usePreferenceStore } from '../preference'
+import { CURRENT_DB_SCHEMA_VERSION } from '@shared/constants'
+import type { AppConfig } from '@shared/types'
 
 // Mock @tauri-apps/plugin-store — returns an in-memory store
 const mockStoreData = new Map<string, unknown>()
@@ -37,6 +39,13 @@ describe('PreferenceStore', () => {
     expect(store.config.locale).toBe('zh-CN')
     // Store.set should have been called
     expect(mockStoreData.get('preferences')).toBeDefined()
+  })
+
+  it('persists the current DB schema version on first save', async () => {
+    await store.updateAndSave({ locale: 'zh-CN' })
+
+    const saved = mockStoreData.get('preferences') as AppConfig
+    expect(saved.dbSchemaVersion).toBe(CURRENT_DB_SCHEMA_VERSION)
   })
 
   // ─── loadPreference ─────────────────────────────────────
