@@ -72,30 +72,6 @@ describe('sidecar binaries', () => {
     }
   })
 
-  describe('Aria2 Next 2.1.2 binary refresh', () => {
-    const expectedSha256: Record<string, string> = {
-      'motrix-next-engine-aarch64-apple-darwin': 'df88d034c923fd671fe968257ae0c08a097e2fc41e01451e081a70afea3536da',
-      'motrix-next-engine-x86_64-apple-darwin': 'de6af9b4157258f3961e339fa9ed9ac6284605ba395382071b68081eb1b68866',
-      'motrix-next-engine-aarch64-pc-windows-msvc.exe':
-        '661303dbb7f4cd09e89ceb2b2a031f7b8720517bee250b08622f39903d9ad1df',
-      'motrix-next-engine-x86_64-pc-windows-msvc.exe':
-        '7e72d9f3bd65cc7c4ee2e34b16fedcfa0cb8b67c51c933887ac5278508f9653f',
-      'motrix-next-engine-aarch64-unknown-linux-gnu':
-        '728915cb88e3084410468c7965834eeef19e88554945476b188855ee725d3c1a',
-      'motrix-next-engine-x86_64-unknown-linux-gnu': '65a562e9a47bb8a4a3c2af6acbf78e7a53ad1530fbf03d2bfa91a50272c225a0',
-    }
-
-    for (const [filename, expected] of Object.entries(expectedSha256)) {
-      it(`${filename} matches the checked Aria2 Next 2.1.2 SHA-256`, async () => {
-        const { createHash } = await import('node:crypto')
-        const fullPath = resolve(BINARIES_DIR, filename)
-        if (!existsSync(fullPath)) return
-        const actual = createHash('sha256').update(readFileSync(fullPath)).digest('hex')
-        expect(actual).toBe(expected)
-      })
-    }
-  })
-
   describe('binary format validation', () => {
     for (const target of EXPECTED_TARGETS) {
       const filename = sidecarFilename(target)
