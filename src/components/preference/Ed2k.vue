@@ -434,12 +434,16 @@ onMounted(() => {
           >
             <template #icon>
               <span class="ed2k-search-icon-stack" aria-hidden="true">
-                <span class="ed2k-search-icon-layer" :class="{ 'ed2k-search-icon-layer--visible': searchActive }">
-                  <span class="ed2k-search-spinner" />
-                </span>
-                <span class="ed2k-search-icon-layer" :class="{ 'ed2k-search-icon-layer--visible': !searchActive }">
-                  <NIcon><SearchOutline /></NIcon>
-                </span>
+                <Transition name="ed2k-search-icon">
+                  <span v-if="searchActive" class="ed2k-search-icon-layer">
+                    <span class="ed2k-search-spinner" />
+                  </span>
+                </Transition>
+                <Transition name="ed2k-search-icon">
+                  <span v-if="!searchActive" class="ed2k-search-icon-layer">
+                    <NIcon><SearchOutline /></NIcon>
+                  </span>
+                </Transition>
               </span>
             </template>
             <Transition name="ed2k-search-label" mode="out-in">
@@ -512,16 +516,8 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
   pointer-events: none;
-  transform: scale(0.88);
-  transition:
-    opacity 0.16s cubic-bezier(0.2, 0, 0, 1),
-    transform 0.16s cubic-bezier(0.2, 0, 0, 1);
-}
-.ed2k-search-icon-layer--visible {
-  opacity: 1;
-  transform: scale(1);
+  will-change: opacity, transform;
 }
 .ed2k-search-spinner {
   width: 14px;
@@ -532,6 +528,12 @@ onMounted(() => {
   animation: ed2k-search-spin 0.8s linear infinite;
   will-change: transform;
   contain: layout style paint;
+}
+.ed2k-search-icon-enter-active {
+  animation: ed2k-search-icon-in 0.3s cubic-bezier(0.2, 0, 0, 1) both;
+}
+.ed2k-search-icon-leave-active {
+  animation: ed2k-search-icon-out 0.26s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 .ed2k-search-label-enter-active,
 .ed2k-search-label-leave-active {
@@ -553,6 +555,26 @@ onMounted(() => {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+@keyframes ed2k-search-icon-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes ed2k-search-icon-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.7);
   }
 }
 </style>
