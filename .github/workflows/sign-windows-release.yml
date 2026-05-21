@@ -188,7 +188,13 @@ jobs:
           jq -r '.[].asset' signing-manifest.json | while IFS= read -r asset; do
             asset="${asset%$'\r'}"
             cp "signed-flat/$asset" "$asset"
-            pnpm --silent tauri signer sign "$asset" > "$asset.sig"
+            signer_output=$(pnpm --silent tauri signer sign "$asset")
+            signature=$(awk '/^Public signature:$/ { getline; print; exit }' <<< "$signer_output")
+            if [ -z "$signature" ]; then
+              echo "Failed to extract public updater signature for $asset" >&2
+              exit 1
+            fi
+            printf '%s' "$signature" > "$asset.sig"
           done
 
       - name: Upload patched release assets
