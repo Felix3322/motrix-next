@@ -93,6 +93,13 @@ const showAdvanced = ref(false)
 const submitting = ref(false)
 const selectedBatchIndex = ref(0)
 const defaultTaskProxyMode = () => normalizeProxyMode(preferenceStore.config.proxy.mode)
+const defaultTaskProxyServer = () => (defaultTaskProxyMode() === 'manual' ? preferenceStore.config.proxy.server : '')
+
+function syncDefaultTaskProxy() {
+  form.value.proxyMode = defaultTaskProxyMode()
+  form.value.customProxy = defaultTaskProxyServer()
+  form.value.appProxy = preferenceStore.config.proxy
+}
 
 const form = ref<AddTaskForm>({
   uris: '',
@@ -107,7 +114,7 @@ const form = ref<AddTaskForm>({
   referer: '',
   cookie: '',
   proxyMode: defaultTaskProxyMode(),
-  customProxy: '',
+  customProxy: defaultTaskProxyServer(),
   appProxy: preferenceStore.config.proxy,
 })
 
@@ -183,6 +190,7 @@ watch(
       }
       // Sync split from the user's Basic preference value
       form.value.split = preferenceStore.config.split ?? form.value.split
+      syncDefaultTaskProxy()
       // Reset the manual-override flag each time the dialog opens
       dirUserModified.value = false
 
@@ -201,6 +209,14 @@ watch(
       }
     }
   },
+)
+
+watch(
+  () => preferenceStore.config.proxy,
+  () => {
+    if (props.show) syncDefaultTaskProxy()
+  },
+  { deep: true },
 )
 
 const checkedRowKeys = computed({
@@ -393,10 +409,8 @@ function handleClose() {
     saveHttpAuth: true,
     referer: '',
     cookie: '',
-    proxyMode: defaultTaskProxyMode(),
-    customProxy: '',
-    appProxy: preferenceStore.config.proxy,
   })
+  syncDefaultTaskProxy()
   submitting.value = false
   selectedBatchIndex.value = 0
 }

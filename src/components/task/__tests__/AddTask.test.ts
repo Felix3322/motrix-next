@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
-import { defineComponent, h, nextTick } from 'vue'
+import { nextTick } from 'vue'
 import AddTask from '@/components/task/AddTask.vue'
+import AdvancedOptions from '@/components/task/addtask/AdvancedOptions.vue'
 import { useAppStore } from '@/stores/app'
 import { createBatchItem, resetBatchIdCounter } from '@shared/utils/batchHelpers'
 
@@ -126,6 +127,33 @@ vi.mock('naive-ui', async () => {
     },
   })
 
+  const NRadioGroup = defineComponent({
+    props: {
+      value: { type: String, default: '' },
+      name: { type: String, default: '' },
+    },
+    setup(props, { slots }) {
+      return () =>
+        h(
+          'div',
+          {
+            'data-radio-group': props.name,
+            'data-value': props.value,
+          },
+          slots.default ? slots.default() : [],
+        )
+    },
+  })
+
+  const NRadio = defineComponent({
+    props: {
+      value: { type: String, default: '' },
+    },
+    setup(props, { slots }) {
+      return () => h('label', { 'data-radio-value': props.value }, slots.default ? slots.default() : [])
+    },
+  })
+
   const NDataTable = defineComponent({
     props: {
       data: { type: Array, default: () => [] },
@@ -144,6 +172,8 @@ vi.mock('naive-ui', async () => {
     NFormItem: passthrough,
     NInput,
     NInputNumber,
+    NRadioGroup,
+    NRadio,
     NButton,
     NSpace: passthrough,
     NGrid: passthrough,
@@ -158,19 +188,12 @@ vi.mock('naive-ui', async () => {
   }
 })
 
-const AdvancedOptionsStub = defineComponent({
-  name: 'AdvancedOptions',
-  setup() {
-    return () => h('div')
-  },
-})
-
 function mountDialog() {
   return mount(AddTask, {
     props: { show: false },
     global: {
       stubs: {
-        AdvancedOptions: AdvancedOptionsStub,
+        AdvancedOptions,
       },
     },
   })
@@ -376,6 +399,38 @@ describe('AddTask split preference sync', () => {
     })
     expect(splitInput).toBeDefined()
     expect(Number((splitInput!.element as HTMLInputElement).value)).toBe(16)
+  })
+
+  it('syncs task proxy mode while the dialog is open when proxy preference changes', async () => {
+    const { usePreferenceStore } = await import('@/stores/preference')
+    const preferenceStore = usePreferenceStore()
+    preferenceStore.$patch({
+      config: { proxy: { mode: 'direct', enable: true, server: '', bypass: '', scope: ['download'] } },
+    })
+
+    const wrapper = mountDialog()
+    await wrapper.setProps({ show: true })
+    await flushPromises()
+    await nextTick()
+
+    expect(wrapper.find('[data-radio-group="add-task-proxy-mode"]').attributes('data-value')).toBe('direct')
+
+    preferenceStore.$patch({
+      config: {
+        proxy: {
+          mode: 'manual',
+          enable: true,
+          server: 'http://127.0.0.1:7890',
+          bypass: '',
+          scope: ['download'],
+        },
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.find('[data-radio-group="add-task-proxy-mode"]').attributes('data-value')).toBe('manual')
+    const proxyInput = wrapper.find('input[placeholder="http://host:port"]')
+    expect((proxyInput.element as HTMLInputElement).value).toBe('http://127.0.0.1:7890')
   })
 })
 
