@@ -190,7 +190,7 @@ describe('buildEngineOptions', () => {
 
   // ── Proxy mode tests ──
 
-  it('uses the app download proxy policy when proxyMode is app', () => {
+  it('does not write task proxy options when proxyMode is app', () => {
     const opts = buildEngineOptions({
       ...baseForm,
       proxyMode: 'app',
@@ -202,9 +202,9 @@ describe('buildEngineOptions', () => {
         scope: ['download'],
       },
     })
-    expect(opts['proxy-mode']).toBe('manual')
-    expect(opts['all-proxy']).toBe('http://127.0.0.1:7890')
-    expect(opts['no-proxy']).toBe('*.local')
+    expect(opts['proxy-mode']).toBeUndefined()
+    expect(opts['all-proxy']).toBeUndefined()
+    expect(opts['no-proxy']).toBeUndefined()
   })
 
   it('forces direct mode when proxyMode is direct', () => {

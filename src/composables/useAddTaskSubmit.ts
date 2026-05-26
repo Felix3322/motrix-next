@@ -31,12 +31,7 @@ import type { Aria2EngineOptions, BatchItem, FileCategory, ProxyConfig } from '@
 import { isMagnetUri } from '@/composables/useMagnetFlow'
 import { sanitizeHttpHeaderOptions } from '@shared/utils/headerSanitize'
 import { getErrorMessage } from '@shared/utils/errorMessage'
-import {
-  buildDownloadProxyOptions,
-  buildTaskProxyOptions,
-  getDownloadProxy,
-  type TaskProxyMode,
-} from '@shared/utils/proxyPolicy'
+import { buildTaskProxyOptions, getDownloadProxy, type TaskProxyMode } from '@shared/utils/proxyPolicy'
 
 export { getDownloadProxy } from '@shared/utils/proxyPolicy'
 
@@ -111,12 +106,7 @@ export function buildEngineOptions(form: AddTaskForm): Aria2EngineOptions {
     options['http-passwd'] = httpAuthPassword
   }
 
-  Object.assign(
-    options,
-    form.proxyMode === 'app' && form.appProxy
-      ? buildDownloadProxyOptions(form.appProxy)
-      : buildTaskProxyOptions(form.proxyMode, form.customProxy, form.appProxy),
-  )
+  Object.assign(options, buildTaskProxyOptions(form.proxyMode, form.customProxy, form.appProxy))
   return options
 }
 

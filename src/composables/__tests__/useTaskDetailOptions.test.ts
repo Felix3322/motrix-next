@@ -212,6 +212,16 @@ describe('useTaskDetailOptions', () => {
       expect(form.proxyMode).toBe('auto')
     })
 
+    it('sets proxyMode to app when auto matches app settings', async () => {
+      const mocks = createMocks({
+        proxyConfig: makeProxy({ mode: 'auto' }),
+        getTaskOption: vi.fn().mockResolvedValue({ proxyMode: 'auto' }),
+      })
+      const { form } = setup(mocks)
+      await nextTick()
+      expect(form.proxyMode).toBe('app')
+    })
+
     it('sets proxyMode to app when manual proxy matches app settings', async () => {
       const mocks = createMocks({
         getTaskOption: vi.fn().mockResolvedValue({ proxyMode: 'manual', allProxy: 'http://127.0.0.1:7890' }),
@@ -318,7 +328,7 @@ describe('useTaskDetailOptions', () => {
       })
     })
 
-    it('sends app proxy policy when proxyMode is app', async () => {
+    it('sends no task proxy options when proxyMode is app', async () => {
       const mocks = createMocks()
       const { form, applyOptions } = setup(mocks)
       await nextTick()
@@ -326,7 +336,7 @@ describe('useTaskDetailOptions', () => {
       await applyOptions()
       expect(mocks.changeTaskOption).toHaveBeenCalledWith({
         gid: 'abc123',
-        options: expect.objectContaining({ 'proxy-mode': 'manual', 'all-proxy': 'http://127.0.0.1:7890' }),
+        options: {},
       })
     })
 

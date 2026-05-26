@@ -27,7 +27,6 @@ import { TASK_STATUS } from '@shared/constants'
 import type { Aria2Task, Aria2EngineOptions, ProxyConfig } from '@shared/types'
 import { logger } from '@shared/logger'
 import {
-  buildDownloadProxyOptions,
   buildTaskProxyOptions,
   hasInvalidManualProxy,
   normalizeProxyMode,
@@ -140,11 +139,15 @@ function normalizeProxyUrl(url: string): string {
  * reconstructs URLs via uri::construct(), which appends a trailing
  * slash (e.g. "http://host:port" → "http://host:port/").
  */
-function detectProxyMode(opts: Record<string, string>, appProxyServer: string): { mode: ProxyMode; custom: string } {
+function detectProxyMode(opts: Record<string, string>, appProxy: ProxyConfig): { mode: ProxyMode; custom: string } {
   const mode = normalizeProxyMode(opts.proxyMode)
   const allProxy = (opts.allProxy as string) ?? ''
-  if (mode === 'direct' || mode === 'auto') return { mode, custom: '' }
+  const appMode = normalizeProxyMode(appProxy.mode)
+  if (mode === 'direct' || mode === 'auto') {
+    return mode === appMode ? { mode: 'app', custom: '' } : { mode, custom: '' }
+  }
   if (mode === 'manual') {
+    const appProxyServer = appProxy.server ?? ''
     if (appProxyServer && normalizeProxyUrl(allProxy) === normalizeProxyUrl(appProxyServer)) {
       return { mode: 'app', custom: '' }
     }
@@ -155,7 +158,7 @@ function detectProxyMode(opts: Record<string, string>, appProxyServer: string): 
 
 // ── Options loader ────────────────────────────────────────────────
 
-function populateFormFromResponse(opts: Record<string, string>, form: TaskDetailOptionsForm, appProxyServer: string) {
+function populateFormFromResponse(opts: Record<string, string>, form: TaskDetailOptionsForm, appProxy: ProxyConfig) {
   form.userAgent = (opts.userAgent as string) ?? ''
   form.referer = (opts.referer as string) ?? ''
 
@@ -166,7 +169,7 @@ function populateFormFromResponse(opts: Record<string, string>, form: TaskDetail
   form.httpAuthUsername = (opts.httpUser as string) ?? ''
   form.httpAuthPassword = (opts.httpPasswd as string) ?? ''
 
-  const detected = detectProxyMode(opts, appProxyServer)
+  const detected = detectProxyMode(opts, appProxy)
   form.proxyMode = detected.mode
   form.customProxy = detected.custom
 }
@@ -244,7 +247,7 @@ export function useTaskDetailOptions(config: UseTaskDetailOptionsConfig) {
   async function loadOptions(gid: string) {
     try {
       const opts = await getTaskOption(gid)
-      populateFormFromResponse(opts, form, appProxyServer.value)
+      populateFormFromResponse(opts, form, proxyConfig())
 
       snapshotForm(form, loaded)
     } catch (err) {
@@ -263,10 +266,7 @@ export function useTaskDetailOptions(config: UseTaskDetailOptionsConfig) {
     if (applying.value || !task.value || !dirty.value) return
     applying.value = true
     try {
-      const proxyOptions =
-        form.proxyMode === 'app'
-          ? buildDownloadProxyOptions(proxyConfig())
-          : buildTaskProxyOptions(form.proxyMode, form.customProxy, proxyConfig())
+      const proxyOptions = buildTaskProxyOptions(form.proxyMode, form.customProxy, proxyConfig())
 
       // Validate proxy format before sending to aria2 — prevents errorCode=28 crash
       if (hasInvalidManualProxy(proxyOptions)) {
