@@ -60,7 +60,7 @@ describe('useEngineRestart', () => {
     )
 
     const { restartEngine, isRestarting } = useEngineRestart()
-    const promise = restartEngine({ port: 24100, secret: 'test' })
+    const promise = restartEngine({ port: 29100, secret: 'test' })
 
     await nextTick()
     expect(isRestarting.value).toBe(true)
@@ -81,12 +81,12 @@ describe('useEngineRestart', () => {
     const { restartEngine } = useEngineRestart()
 
     // First call starts restart
-    const first = restartEngine({ port: 24100, secret: 'test' })
+    const first = restartEngine({ port: 29100, secret: 'test' })
 
     await nextTick()
 
     // Second call while first is in-flight should be rejected
-    const secondResult = await restartEngine({ port: 24100, secret: 'test' })
+    const secondResult = await restartEngine({ port: 29100, secret: 'test' })
     expect(secondResult).toBe(false)
 
     // Only ONE invoke call should have been made
@@ -100,7 +100,7 @@ describe('useEngineRestart', () => {
     mockInvoke.mockRejectedValueOnce(new Error('engine crash'))
 
     const { restartEngine, isRestarting } = useEngineRestart()
-    const result = await restartEngine({ port: 24100, secret: 'test' })
+    const result = await restartEngine({ port: 29100, secret: 'test' })
 
     // Guard must be released even after failure
     expect(result).toBe(false)
@@ -114,7 +114,7 @@ describe('useEngineRestart', () => {
     })
 
     const { restartEngine } = useEngineRestart()
-    const result = await restartEngine({ port: 24100, secret: 'test' })
+    const result = await restartEngine({ port: 29100, secret: 'test' })
     expect(result).toBe(false)
   })
 
@@ -122,17 +122,17 @@ describe('useEngineRestart', () => {
     const { restartEngine, isRestarting } = useEngineRestart()
 
     // First restart succeeds
-    await restartEngine({ port: 24100, secret: 'test' })
+    await restartEngine({ port: 29100, secret: 'test' })
     expect(isRestarting.value).toBe(false)
 
     // Second restart should also be allowed
-    const result = await restartEngine({ port: 24100, secret: 'test' })
+    const result = await restartEngine({ port: 29100, secret: 'test' })
     expect(result).toBe(true)
   })
 
   it('calls restart_engine_command then wait_for_engine via invoke', async () => {
     const { restartEngine } = useEngineRestart()
-    await restartEngine({ port: 24100, secret: 'abc' })
+    await restartEngine({ port: 29100, secret: 'abc' })
     expect(mockInvoke).toHaveBeenCalledWith('restart_engine_command')
     expect(mockInvoke).toHaveBeenCalledWith('wait_for_engine')
   })
@@ -140,7 +140,7 @@ describe('useEngineRestart', () => {
   it('sets engineReady=true on success', async () => {
     mockAppStore.engineReady = false
     const { restartEngine } = useEngineRestart()
-    await restartEngine({ port: 24100, secret: 'abc' })
+    await restartEngine({ port: 29100, secret: 'abc' })
     expect(mockAppStore.engineReady).toBe(true)
   })
 })

@@ -192,10 +192,10 @@ mod tests {
     fn cleanup_port_rejects_shell_injection_attempts() {
         // These must NOT panic AND must NOT execute any shell command.
         // The u16 parse guard should reject all of these at the gate.
-        cleanup_port("24100; rm -rf /");
-        cleanup_port("24100 && echo pwned");
+        cleanup_port("29100; rm -rf /");
+        cleanup_port("29100 && echo pwned");
         cleanup_port("$(whoami)");
-        cleanup_port("24100|cat /etc/passwd");
+        cleanup_port("29100|cat /etc/passwd");
     }
 
     #[test]
@@ -220,7 +220,7 @@ mod tests {
         // listening on these ports — that's fine, the test verifies
         // the validation layer lets them through.
         cleanup_port("1");
-        cleanup_port("24100");
+        cleanup_port("29100");
         cleanup_port("65535");
     }
 

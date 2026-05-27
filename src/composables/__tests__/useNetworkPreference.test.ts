@@ -155,14 +155,14 @@ describe('buildNetworkForm', () => {
     expect(form.enableUpnp).toBe(false)
   })
 
-  it('defaults listenPort to 24120', () => {
+  it('defaults listenPort to 29120', () => {
     const form = buildNetworkForm(emptyConfig)
-    expect(form.listenPort).toBe(24120)
+    expect(form.listenPort).toBe(29120)
   })
 
-  it('defaults dhtListenPort to 24130', () => {
+  it('defaults dhtListenPort to 29130', () => {
     const form = buildNetworkForm(emptyConfig)
-    expect(form.dhtListenPort).toBe(24130)
+    expect(form.dhtListenPort).toBe(29130)
   })
 
   it('coerces string port values to numbers', () => {
@@ -241,8 +241,8 @@ describe('buildNetworkForm', () => {
     const form = buildNetworkForm(emptyConfig)
     expect(form.portConflictRecovery).toEqual({
       enabled: true,
-      rangeStart: 24000,
-      rangeEnd: 24999,
+      rangeStart: 29000,
+      rangeEnd: 29999,
       rpc: true,
       extensionApi: true,
       bt: true,
@@ -266,8 +266,8 @@ describe('buildNetworkSystemConfig', () => {
     enableUpnp: true,
     autoChangeConflictingPorts: true,
     portConflictRecovery: { ...DEFAULT_APP_CONFIG.portConflictRecovery },
-    listenPort: 24120,
-    dhtListenPort: 24130,
+    listenPort: 29120,
+    dhtListenPort: 29130,
     connectTimeout: 10,
     timeout: 10,
     fileAllocation: 'none',
@@ -276,8 +276,8 @@ describe('buildNetworkSystemConfig', () => {
 
   it('maps port and protocol keys to aria2 config', () => {
     const config = buildNetworkSystemConfig(baseForm)
-    expect(config['listen-port']).toBe('24120')
-    expect(config['dht-listen-port']).toBe('24130')
+    expect(config['listen-port']).toBe('29120')
+    expect(config['dht-listen-port']).toBe('29130')
     expect(config['enable-dht']).toBe('true')
     expect(config['enable-peer-exchange']).toBe('true')
   })
@@ -397,8 +397,8 @@ describe('transformNetworkForStore', () => {
     enableUpnp: true,
     autoChangeConflictingPorts: true,
     portConflictRecovery: { ...DEFAULT_APP_CONFIG.portConflictRecovery },
-    listenPort: 24120,
-    dhtListenPort: 24130,
+    listenPort: 29120,
+    dhtListenPort: 29130,
     connectTimeout: 10,
     timeout: 10,
     fileAllocation: 'none',
@@ -407,9 +407,9 @@ describe('transformNetworkForStore', () => {
 
   it('preserves port numbers as numbers (not strings)', () => {
     const result = transformNetworkForStore(baseForm)
-    expect(result.listenPort).toBe(24120)
+    expect(result.listenPort).toBe(29120)
     expect(typeof result.listenPort).toBe('number')
-    expect(result.dhtListenPort).toBe(24130)
+    expect(result.dhtListenPort).toBe(29130)
     expect(typeof result.dhtListenPort).toBe('number')
   })
 
@@ -456,8 +456,8 @@ describe('validateNetworkForm', () => {
     enableUpnp: true,
     autoChangeConflictingPorts: true,
     portConflictRecovery: { ...DEFAULT_APP_CONFIG.portConflictRecovery },
-    listenPort: 24120,
-    dhtListenPort: 24130,
+    listenPort: 29120,
+    dhtListenPort: 29130,
     connectTimeout: 10,
     timeout: 10,
     fileAllocation: 'none',
@@ -543,16 +543,16 @@ describe('port randomizers', () => {
   it('randomBtPort stays within the port recovery range', () => {
     for (let i = 0; i < 20; i++) {
       const port = randomBtPort()
-      expect(port).toBeGreaterThanOrEqual(24000)
-      expect(port).toBeLessThanOrEqual(24999)
+      expect(port).toBeGreaterThanOrEqual(29000)
+      expect(port).toBeLessThanOrEqual(29999)
     }
   })
 
   it('randomDhtPort stays within the port recovery range', () => {
     for (let i = 0; i < 20; i++) {
       const port = randomDhtPort()
-      expect(port).toBeGreaterThanOrEqual(24000)
-      expect(port).toBeLessThanOrEqual(24999)
+      expect(port).toBeGreaterThanOrEqual(29000)
+      expect(port).toBeLessThanOrEqual(29999)
     }
   })
 })

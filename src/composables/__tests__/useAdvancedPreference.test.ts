@@ -174,8 +174,8 @@ describe('buildAdvancedForm', () => {
     expect(form.proxy.scope).toEqual(expect.arrayContaining([PROXY_SCOPES.DOWNLOAD]))
     expect(form.proxy.scope).toHaveLength(PROXY_SCOPE_OPTIONS.length)
     expect(form.rpcListenPort).toBe(ENGINE_RPC_PORT)
-    expect(form.listenPort).toBe(24120)
-    expect(form.dhtListenPort).toBe(24130)
+    expect(form.listenPort).toBe(29120)
+    expect(form.dhtListenPort).toBe(29130)
     expect(form.logLevel).toBe('debug')
     expect(form.enableUpnp).toBe(true)
   })
@@ -248,16 +248,16 @@ describe('buildAdvancedSystemConfig', () => {
     btTracker: 'udp://t1.org:6969\nudp://t2.org:6969',
     autoSyncTracker: false,
     lastSyncTrackerTime: 0,
-    rpcListenPort: 24100,
+    rpcListenPort: 29100,
     rpcSecret: 'testSecret',
     enableUpnp: true,
-    listenPort: 24120,
-    dhtListenPort: 24130,
+    listenPort: 29120,
+    dhtListenPort: 29130,
     userAgent: '',
     logLevel: 'warn',
     tempFilesDir: '',
     hardwareRendering: false,
-    extensionApiPort: 24110,
+    extensionApiPort: 29110,
     extensionApiSecret: 'test-api-secret',
     autoSubmitFromExtension: false,
     autoSelectAllFilesFromExtension: false,
@@ -281,12 +281,12 @@ describe('buildAdvancedSystemConfig', () => {
 
   it('maps all required aria2 config keys', () => {
     const config = buildAdvancedSystemConfig(baseForm)
-    expect(config['rpc-listen-port']).toBe('24100')
+    expect(config['rpc-listen-port']).toBe('29100')
     expect(config['rpc-secret']).toBe('testSecret')
     expect(config['enable-dht']).toBe('true')
     expect(config['enable-peer-exchange']).toBe('true')
-    expect(config['listen-port']).toBe('24120')
-    expect(config['dht-listen-port']).toBe('24130')
+    expect(config['listen-port']).toBe('29120')
+    expect(config['dht-listen-port']).toBe('29130')
     expect(config['log-level']).toBe('warn')
   })
 
@@ -345,16 +345,16 @@ describe('transformAdvancedForStore', () => {
       btTracker: 'udp://a\nudp://b',
       autoSyncTracker: false,
       lastSyncTrackerTime: 0,
-      rpcListenPort: 24100,
+      rpcListenPort: 29100,
       rpcSecret: 'x',
       enableUpnp: true,
-      listenPort: 24120,
-      dhtListenPort: 24130,
+      listenPort: 29120,
+      dhtListenPort: 29130,
       userAgent: '',
       logLevel: 'warn',
       tempFilesDir: '',
       hardwareRendering: false,
-      extensionApiPort: 24110,
+      extensionApiPort: 29110,
       extensionApiSecret: 'test-api-secret',
       autoSubmitFromExtension: false,
       autoSelectAllFilesFromExtension: false,
@@ -387,16 +387,16 @@ describe('transformAdvancedForStore', () => {
       btTracker: '',
       autoSyncTracker: false,
       lastSyncTrackerTime: 0,
-      rpcListenPort: 24100,
+      rpcListenPort: 29100,
       rpcSecret: 'x',
       enableUpnp: true,
-      listenPort: 24120,
-      dhtListenPort: 24130,
+      listenPort: 29120,
+      dhtListenPort: 29130,
       userAgent: '',
       logLevel: 'warn',
       tempFilesDir: '',
       hardwareRendering: false,
-      extensionApiPort: 24110,
+      extensionApiPort: 29110,
       extensionApiSecret: 'test-api-secret',
       autoSubmitFromExtension: false,
       autoSelectAllFilesFromExtension: false,
@@ -432,16 +432,16 @@ describe('transformAdvancedForStore', () => {
       btTracker: '',
       autoSyncTracker: false,
       lastSyncTrackerTime: 0,
-      rpcListenPort: 24100,
+      rpcListenPort: 29100,
       rpcSecret: 'x',
       enableUpnp: true,
-      listenPort: 24120,
-      dhtListenPort: 24130,
+      listenPort: 29120,
+      dhtListenPort: 29130,
       userAgent: '',
       logLevel: 'warn',
       tempFilesDir: '',
       hardwareRendering: false,
-      extensionApiPort: 24110,
+      extensionApiPort: 29110,
       extensionApiSecret: 'test-api-secret',
       autoSubmitFromExtension: false,
       autoSelectAllFilesFromExtension: false,
@@ -463,9 +463,9 @@ describe('transformAdvancedForStore', () => {
       fileAllocation: 'prealloc',
     }
     const result = transformAdvancedForStore(form)
-    expect(result.listenPort).toBe(24120)
+    expect(result.listenPort).toBe(29120)
     expect(typeof result.listenPort).toBe('number')
-    expect(result.dhtListenPort).toBe(24130)
+    expect(result.dhtListenPort).toBe(29130)
     expect(typeof result.dhtListenPort).toBe('number')
   })
 
@@ -479,9 +479,9 @@ describe('transformAdvancedForStore', () => {
     // This is the exact scenario that caused the bug: config → form → store → diffConfig
     // should report ZERO changes when the user didn't touch anything.
     const config = {
-      listenPort: 24120,
-      dhtListenPort: 24130,
-      rpcListenPort: 24100,
+      listenPort: 29120,
+      dhtListenPort: 29130,
+      rpcListenPort: 29100,
       rpcSecret: 'existingSecret',
       enableUpnp: false,
     } as AppConfig
@@ -578,16 +578,16 @@ describe('validateAdvancedForm', () => {
     btTracker: '',
     autoSyncTracker: false,
     lastSyncTrackerTime: 0,
-    rpcListenPort: 24100,
+    rpcListenPort: 29100,
     rpcSecret: 'validSecret',
     enableUpnp: true,
-    listenPort: 24120,
-    dhtListenPort: 24130,
+    listenPort: 29120,
+    dhtListenPort: 29130,
     userAgent: '',
     logLevel: 'warn',
     tempFilesDir: '',
     hardwareRendering: false,
-    extensionApiPort: 24110,
+    extensionApiPort: 29110,
     extensionApiSecret: 'test-api-secret',
     autoSubmitFromExtension: false,
     autoSelectAllFilesFromExtension: false,
@@ -752,16 +752,16 @@ describe('proxy configuration invariants', () => {
       btTracker: '',
       autoSyncTracker: false,
       lastSyncTrackerTime: 0,
-      rpcListenPort: 24100,
+      rpcListenPort: 29100,
       rpcSecret: 'x',
       enableUpnp: true,
-      listenPort: 24120,
-      dhtListenPort: 24130,
+      listenPort: 29120,
+      dhtListenPort: 29130,
       userAgent: '',
       logLevel: 'debug',
       tempFilesDir: '',
       hardwareRendering: false,
-      extensionApiPort: 24110,
+      extensionApiPort: 29110,
       extensionApiSecret: 'test-api-secret',
       autoSubmitFromExtension: false,
       autoSelectAllFilesFromExtension: false,
@@ -802,16 +802,16 @@ describe('proxy configuration invariants', () => {
       btTracker: '',
       autoSyncTracker: false,
       lastSyncTrackerTime: 0,
-      rpcListenPort: 24100,
+      rpcListenPort: 29100,
       rpcSecret: 'x',
       enableUpnp: true,
-      listenPort: 24120,
-      dhtListenPort: 24130,
+      listenPort: 29120,
+      dhtListenPort: 29130,
       userAgent: '',
       logLevel: 'debug',
       tempFilesDir: '',
       hardwareRendering: false,
-      extensionApiPort: 24110,
+      extensionApiPort: 29110,
       extensionApiSecret: 'test-api-secret',
       autoSubmitFromExtension: false,
       autoSelectAllFilesFromExtension: false,
@@ -851,16 +851,16 @@ describe('proxy configuration invariants', () => {
       btTracker: '',
       autoSyncTracker: false,
       lastSyncTrackerTime: 0,
-      rpcListenPort: 24100,
+      rpcListenPort: 29100,
       rpcSecret: 'x',
       enableUpnp: true,
-      listenPort: 24120,
-      dhtListenPort: 24130,
+      listenPort: 29120,
+      dhtListenPort: 29130,
       userAgent: '',
       logLevel: 'debug',
       tempFilesDir: '',
       hardwareRendering: false,
-      extensionApiPort: 24110,
+      extensionApiPort: 29110,
       extensionApiSecret: 'test-api-secret',
       autoSubmitFromExtension: false,
       autoSelectAllFilesFromExtension: false,
@@ -918,16 +918,16 @@ describe('transformAdvancedForStore — hardwareRendering', () => {
       btTracker: '',
       autoSyncTracker: false,
       lastSyncTrackerTime: 0,
-      rpcListenPort: 24100,
+      rpcListenPort: 29100,
       rpcSecret: 'x',
       enableUpnp: true,
-      listenPort: 24120,
-      dhtListenPort: 24130,
+      listenPort: 29120,
+      dhtListenPort: 29130,
       userAgent: '',
       logLevel: 'warn',
       tempFilesDir: '',
       hardwareRendering: true,
-      extensionApiPort: 24110,
+      extensionApiPort: 29110,
       extensionApiSecret: 'test-api-secret',
       autoSubmitFromExtension: false,
       autoSelectAllFilesFromExtension: false,

@@ -104,16 +104,16 @@ describe('diffConfig', () => {
     expect(result).toEqual({ proxy: { host: 'b' } })
   })
 
-  it('treats coerce-equal primitives as unchanged (string "24120" vs number 24120)', () => {
+  it('treats coerce-equal primitives as unchanged (string "29120" vs number 29120)', () => {
     const result = diffConfig(
-      { listenPort: '24120', dhtListenPort: '24130' },
-      { listenPort: 24120, dhtListenPort: 24130 },
+      { listenPort: '29120', dhtListenPort: '29130' },
+      { listenPort: 29120, dhtListenPort: 29130 },
     )
     expect(result).toEqual({})
   })
 
   it('still detects genuinely different values across types', () => {
-    const result = diffConfig({ listenPort: '24120' }, { listenPort: 21302 })
+    const result = diffConfig({ listenPort: '29120' }, { listenPort: 21302 })
     expect(result).toEqual({ listenPort: 21302 })
   })
 })
@@ -153,8 +153,8 @@ describe('checkIsNeedRestart', () => {
     // Simulates the real bug: prevConfig stores ports as strings,
     // form uses numbers, but the actual values are identical.
     const changed = diffConfig(
-      { listenPort: '24120', dhtListenPort: '24130', rpcListenPort: 24100, rpcSecret: 'abc' },
-      { listenPort: 24120, dhtListenPort: 24130, rpcListenPort: 24100, rpcSecret: 'abc' },
+      { listenPort: '29120', dhtListenPort: '29130', rpcListenPort: 29100, rpcSecret: 'abc' },
+      { listenPort: 29120, dhtListenPort: 29130, rpcListenPort: 29100, rpcSecret: 'abc' },
     )
     expect(checkIsNeedRestart(changed)).toBe(false)
   })
@@ -265,12 +265,12 @@ describe('filterHotReloadableKeys', () => {
 
   it('strips restart-required keys (ports + secret)', () => {
     const config = {
-      'rpc-listen-port': '24100',
+      'rpc-listen-port': '29100',
       'rpc-secret': 'abc',
-      'listen-port': '24120',
-      'dht-listen-port': '24130',
-      'ed2k-listen-port': '24140',
-      'ed2k-udp-listen-port': '24150',
+      'listen-port': '29120',
+      'dht-listen-port': '29130',
+      'ed2k-listen-port': '29140',
+      'ed2k-udp-listen-port': '29150',
       'enable-dht': 'true',
     }
     expect(filterHotReloadableKeys(config)).toEqual({})
@@ -311,7 +311,7 @@ describe('filterHotReloadableKeys', () => {
   it('separates hot-reloadable from non-hot-reloadable in mixed input', () => {
     const config = {
       'max-concurrent-downloads': '8',
-      'rpc-listen-port': '24100',
+      'rpc-listen-port': '29100',
       'bt-tracker': 'udp://t.example.org:6969',
       'rpc-secret': 'secret',
       'user-agent': 'Motrix/3.4.1',

@@ -118,7 +118,7 @@ mod tests {
     #[test]
     fn strip_ansi_handles_notice_tag() {
         let input =
-            "03/15 00:56:16 [\x1b[1;32mNOTICE\x1b[0m] IPv4 RPC: listening on TCP port 24100";
+            "03/15 00:56:16 [\x1b[1;32mNOTICE\x1b[0m] IPv4 RPC: listening on TCP port 29100";
         let clean = strip_ansi(input);
         assert!(clean.contains("[NOTICE]"));
         assert!(!clean.contains("\x1b"));

@@ -12,7 +12,7 @@ static BT_PORT_RECOVERY_IN_FLIGHT: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
 
 const ENGINE_SIDECAR_NAME: &str = "motrix-next-engine";
-const DEFAULT_RPC_PORT_STR: &str = "24100";
+const DEFAULT_RPC_PORT_STR: &str = "29100";
 
 fn recover_runtime_port_conflict(app: &tauri::AppHandle, kind: port_guard::PortKind) {
     if BT_PORT_RECOVERY_IN_FLIGHT.swap(true, Ordering::SeqCst) {

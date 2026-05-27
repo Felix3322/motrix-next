@@ -34,7 +34,7 @@ export const MESSAGE_DURATION = 3000
 export const RPC_TIMEOUT = 15_000
 
 /** Default aria2 RPC listen port. */
-export const DEFAULT_ARIA2_PORT = 24100
+export const DEFAULT_ARIA2_PORT = 29100
 
 /** Minimum visible loading duration for tracker sync animation (ms). */
 export const SYNC_MIN_DURATION = 600

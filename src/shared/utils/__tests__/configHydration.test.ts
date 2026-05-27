@@ -28,7 +28,7 @@ describe('hydrateAppConfig', () => {
       proxy: { mode: 'manual', enable: true, server: 'http://127.0.0.1:7890' } as AppConfig['proxy'],
       protocols: { magnet: false } as AppConfig['protocols'],
       clipboard: { enable: false, http: false } as AppConfig['clipboard'],
-      portConflictRecovery: { enabled: false, rangeStart: 24050 } as AppConfig['portConflictRecovery'],
+      portConflictRecovery: { enabled: false, rangeStart: 29050 } as AppConfig['portConflictRecovery'],
     })
 
     expect(result.config.proxy).toEqual({
@@ -42,7 +42,7 @@ describe('hydrateAppConfig', () => {
     expect(result.config.portConflictRecovery).toEqual({
       ...DEFAULT_APP_CONFIG.portConflictRecovery,
       enabled: false,
-      rangeStart: 24050,
+      rangeStart: 29050,
     })
   })
 

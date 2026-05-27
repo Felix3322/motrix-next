@@ -333,7 +333,7 @@ export interface AppConfig {
   userAgent: string
   rpcListenPort: number
   /** Port for the embedded HTTP API that browser extensions use to submit
-   *  downloads.  Defaults to 24110 (one above the aria2 RPC port). */
+   *  downloads. Defaults to 29110. */
   extensionApiPort: number
   /** Shared secret for the extension HTTP API.  The browser extension must
    *  send this as a `Bearer` token in the `Authorization` header.

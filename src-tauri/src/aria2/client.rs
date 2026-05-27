@@ -356,7 +356,7 @@ mod tests {
 
     #[tokio::test]
     async fn build_params_prepends_token_when_secret_is_set() {
-        let client = Aria2Client::new(24100, "mysecret".to_string());
+        let client = Aria2Client::new(29100, "mysecret".to_string());
         let params = client.build_params(vec![serde_json::json!("arg1")]).await;
 
         assert_eq!(params.len(), 2);
@@ -366,7 +366,7 @@ mod tests {
 
     #[tokio::test]
     async fn build_params_omits_token_when_secret_is_empty() {
-        let client = Aria2Client::new(24100, String::new());
+        let client = Aria2Client::new(29100, String::new());
         let params = client.build_params(vec![serde_json::json!("arg1")]).await;
 
         assert_eq!(params.len(), 1);
@@ -375,7 +375,7 @@ mod tests {
 
     #[tokio::test]
     async fn build_params_empty_extra_with_secret() {
-        let client = Aria2Client::new(24100, "sec".to_string());
+        let client = Aria2Client::new(29100, "sec".to_string());
         let params = client.build_params(vec![]).await;
 
         assert_eq!(params.len(), 1);
@@ -384,7 +384,7 @@ mod tests {
 
     #[tokio::test]
     async fn build_params_empty_extra_without_secret() {
-        let client = Aria2Client::new(24100, String::new());
+        let client = Aria2Client::new(29100, String::new());
         let params = client.build_params(vec![]).await;
 
         assert!(params.is_empty());
@@ -408,15 +408,15 @@ mod tests {
 
     #[tokio::test]
     async fn update_credentials_changes_port_and_secret() {
-        let client = Aria2Client::new(24100, "old".to_string());
-        assert_eq!(*client.port.read().await, 24100);
+        let client = Aria2Client::new(29100, "old".to_string());
+        assert_eq!(*client.port.read().await, 29100);
         assert_eq!(*client.secret.read().await, "old");
 
         client
-            .update_credentials(24120, "new_secret".to_string())
+            .update_credentials(29120, "new_secret".to_string())
             .await;
 
-        assert_eq!(*client.port.read().await, 24120);
+        assert_eq!(*client.port.read().await, 29120);
         assert_eq!(*client.secret.read().await, "new_secret");
     }
 
@@ -424,7 +424,7 @@ mod tests {
 
     #[test]
     fn request_id_increments_monotonically() {
-        let client = Aria2Client::new(24100, String::new());
+        let client = Aria2Client::new(29100, String::new());
         let id1 = client.request_id.fetch_add(1, Ordering::Relaxed);
         let id2 = client.request_id.fetch_add(1, Ordering::Relaxed);
         let id3 = client.request_id.fetch_add(1, Ordering::Relaxed);
@@ -438,7 +438,7 @@ mod tests {
 
     #[test]
     fn aria2_state_wraps_client_in_arc() {
-        let client = Aria2Client::new(24100, "test".to_string());
+        let client = Aria2Client::new(29100, "test".to_string());
         let state = Aria2State(Arc::new(client));
         // Arc clone produces a second strong reference
         let _clone = state.0.clone();
@@ -471,7 +471,7 @@ mod tests {
     #[tokio::test]
     async fn token_format_matches_aria2_protocol() {
         // aria2 expects exactly "token:{secret}" as the first param
-        let client = Aria2Client::new(24100, "s3cret!@#$".to_string());
+        let client = Aria2Client::new(29100, "s3cret!@#$".to_string());
         let params = client.build_params(vec![]).await;
 
         let token = params[0].as_str().expect("token must be a string");
@@ -486,7 +486,7 @@ mod tests {
 
     #[tokio::test]
     async fn build_params_preserves_multiple_extra_params_order() {
-        let client = Aria2Client::new(24100, "sec".to_string());
+        let client = Aria2Client::new(29100, "sec".to_string());
         let params = client
             .build_params(vec![
                 serde_json::json!("first"),

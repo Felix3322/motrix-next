@@ -20,8 +20,8 @@ import {
 import type { AppConfig } from '@shared/types'
 
 const baseForm: Ed2kForm = {
-  ed2kListenPort: 24140,
-  ed2kUdpListenPort: 24150,
+  ed2kListenPort: 29140,
+  ed2kUdpListenPort: 29150,
   ed2kServer: '',
   ed2kServerList: '',
   ed2kNodeList: '',
@@ -34,8 +34,8 @@ describe('buildEd2kForm', () => {
   it('defaults to Aria2 Next ED2K values', () => {
     const form = buildEd2kForm({} as AppConfig)
 
-    expect(form.ed2kListenPort).toBe(24140)
-    expect(form.ed2kUdpListenPort).toBe(24150)
+    expect(form.ed2kListenPort).toBe(29140)
+    expect(form.ed2kUdpListenPort).toBe(29150)
     expect(form.ed2kServer).toBe('')
     expect(form.ed2kServerList).toBe('')
     expect(form.ed2kNodeList).toBe('')
@@ -66,8 +66,8 @@ describe('buildEd2kSystemConfig', () => {
     })
 
     expect(config).toEqual({
-      'ed2k-listen-port': '24140',
-      'ed2k-udp-listen-port': '24150',
+      'ed2k-listen-port': '29140',
+      'ed2k-udp-listen-port': '29150',
       'ed2k-server': 'server-one.example:4661,server-two.example:4661',
       'ed2k-server-list': '/lists/server.met',
       'ed2k-node-list': '/lists/nodes.dat',
@@ -89,8 +89,8 @@ describe('transformEd2kForStore', () => {
     })
 
     expect(result).toEqual({
-      ed2kListenPort: 24140,
-      ed2kUdpListenPort: 24150,
+      ed2kListenPort: 29140,
+      ed2kUdpListenPort: 29150,
       ed2kServer: 'server-one.example:4661,server-two.example:4661',
       ed2kServerList: '/lists/server.met',
       ed2kNodeList: '/lists/nodes.dat',
@@ -147,8 +147,8 @@ describe('randomEd2kPort', () => {
   it('chooses ports from the ED2K auto-recovery range', () => {
     for (let i = 0; i < 100; i++) {
       const port = randomEd2kPort()
-      expect(port).toBeGreaterThanOrEqual(24000)
-      expect(port).toBeLessThanOrEqual(24999)
+      expect(port).toBeGreaterThanOrEqual(29000)
+      expect(port).toBeLessThanOrEqual(29999)
     }
   })
 })

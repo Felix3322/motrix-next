@@ -11,7 +11,7 @@ use serde::Deserialize;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-pub const DEFAULT_EXTENSION_API_PORT: u16 = 24110;
+pub const DEFAULT_EXTENSION_API_PORT: u16 = 29110;
 
 /// Subset of `AppConfig` fields consumed by Rust runtime services.
 ///
@@ -194,7 +194,7 @@ mod tests {
             "theme": "dark",
             "dir": "/downloads",
             "split": 16,
-            "rpcListenPort": 24100,
+            "rpcListenPort": 29100,
             "rpcSecret": "changeme"
         });
 

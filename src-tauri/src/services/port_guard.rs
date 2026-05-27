@@ -8,14 +8,14 @@ use std::net::{TcpListener, UdpSocket};
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_store::StoreExt;
 
-pub(crate) const DEFAULT_RPC_PORT: u16 = 24100;
-pub(crate) const DEFAULT_EXTENSION_API_PORT: u16 = 24110;
-pub(crate) const DEFAULT_BT_PORT: u16 = 24120;
-pub(crate) const DEFAULT_DHT_PORT: u16 = 24130;
-pub(crate) const DEFAULT_ED2K_PORT: u16 = 24140;
-pub(crate) const DEFAULT_ED2K_UDP_PORT: u16 = 24150;
-const DEFAULT_RECOVERY_RANGE_START: u16 = 24000;
-const DEFAULT_RECOVERY_RANGE_END: u16 = 24999;
+pub(crate) const DEFAULT_RPC_PORT: u16 = 29100;
+pub(crate) const DEFAULT_EXTENSION_API_PORT: u16 = 29110;
+pub(crate) const DEFAULT_BT_PORT: u16 = 29120;
+pub(crate) const DEFAULT_DHT_PORT: u16 = 29130;
+pub(crate) const DEFAULT_ED2K_PORT: u16 = 29140;
+pub(crate) const DEFAULT_ED2K_UDP_PORT: u16 = 29150;
+const DEFAULT_RECOVERY_RANGE_START: u16 = 29000;
+const DEFAULT_RECOVERY_RANGE_END: u16 = 29999;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -723,13 +723,13 @@ mod tests {
     fn aria2_runtime_bind_error_kind_classifies_runtime_port_failures() {
         assert_eq!(
             aria2_runtime_bind_error_kind(
-                "05/14 10:24:11 [ERROR] IPv4 BitTorrent: failed to bind TCP port 24120"
+                "05/14 10:24:11 [ERROR] IPv4 BitTorrent: failed to bind TCP port 29120"
             ),
             Some(PortKind::Bt)
         );
         assert_eq!(
             aria2_runtime_bind_error_kind(
-                "05/14 10:24:11 [ERROR] IPv4 DHT: failed to bind UDP port 24130"
+                "05/14 10:24:11 [ERROR] IPv4 DHT: failed to bind UDP port 29130"
             ),
             Some(PortKind::Dht)
         );
@@ -741,13 +741,13 @@ mod tests {
         );
         assert_eq!(
             aria2_runtime_bind_error_kind(
-                "05/14 10:24:11 [NOTICE] IPv4 RPC: listening on TCP port 24100"
+                "05/14 10:24:11 [NOTICE] IPv4 RPC: listening on TCP port 29100"
             ),
             None
         );
         assert_eq!(
             aria2_runtime_bind_error_kind(
-                "05/26 22:14:21 [ERROR] IPv6 RPC: failed to bind TCP port 24100: Address already in use"
+                "05/26 22:14:21 [ERROR] IPv6 RPC: failed to bind TCP port 29100: Address already in use"
             ),
             None
         );
@@ -763,13 +763,13 @@ mod tests {
     fn replacement_port_never_returns_the_current_port() {
         let policy = PortRecoveryPolicy {
             range: PortRange {
-                start: 24000,
-                end: 24002,
+                start: 29000,
+                end: 29002,
             },
             ..default_recovery_policy(true)
         };
-        let reserved = BTreeSet::from([24001, 24002]);
+        let reserved = BTreeSet::from([29001, 29002]);
 
-        assert_eq!(choose_replacement_port(policy, &reserved, 24000), None);
+        assert_eq!(choose_replacement_port(policy, &reserved, 29000), None);
     }
 }
