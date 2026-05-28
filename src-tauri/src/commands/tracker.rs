@@ -35,10 +35,14 @@ struct TrackerProbeEvent {
 /// Classifies a tracker URL's protocol to determine probing strategy.
 ///
 /// - `"probeable"` — HTTP/HTTPS trackers that can be checked with HEAD requests
-/// - `"unknown"` — UDP/WS/WSS trackers that cannot be probed from HTTP
+/// - `"not-probed"` — UDP/WS/WSS trackers that cannot be probed from HTTP
 fn classify_tracker_protocol(url: &str) -> &'static str {
-    if url.starts_with("udp://") || url.starts_with("ws://") || url.starts_with("wss://") {
-        "unknown"
+    let lower_url = url.to_ascii_lowercase();
+    if lower_url.starts_with("udp://")
+        || lower_url.starts_with("ws://")
+        || lower_url.starts_with("wss://")
+    {
+        "not-probed"
     } else {
         "probeable"
     }
@@ -47,11 +51,11 @@ fn classify_tracker_protocol(url: &str) -> &'static str {
 /// Probes a single tracker URL and returns its reachability status.
 ///
 /// Pure function extracted from [`probe_trackers`] for testability.
-/// Non-HTTP protocols (UDP, WS, WSS) are classified as `"unknown"`
+/// Non-HTTP protocols (UDP, WS, WSS) are classified as `"not-probed"`
 /// without network access; HTTP/HTTPS trackers receive a HEAD request.
 async fn probe_single(client: &reqwest::Client, url: &str) -> &'static str {
-    if classify_tracker_protocol(url) == "unknown" {
-        return "unknown";
+    if classify_tracker_protocol(url) == "not-probed" {
+        return "not-probed";
     }
     match client.head(url).send().await {
         Ok(_) => "online",
@@ -67,7 +71,7 @@ async fn probe_single(client: &reqwest::Client, url: &str) -> &'static str {
 /// the frontend can update the corresponding table row immediately,
 /// rather than waiting for all probes to finish.
 ///
-/// UDP/WS/WSS trackers are marked `"unknown"` without network access.
+/// UDP/WS/WSS trackers are marked `"not-probed"` without network access.
 #[tauri::command]
 pub async fn probe_trackers(app: AppHandle, urls: Vec<String>) -> Result<(), AppError> {
     log::debug!("tracker:probe urls={}", urls.len());
@@ -189,27 +193,27 @@ mod tests {
     // ── probe_single ──────────────────────────────────────────────────
 
     #[test]
-    fn test_probe_single_classifies_udp_as_unknown() {
+    fn test_probe_single_classifies_udp_as_not_probed() {
         let rt = tokio::runtime::Runtime::new().expect("create tokio runtime");
         let client = reqwest::Client::new();
         let status = rt.block_on(probe_single(&client, "udp://tracker.example.com:6969"));
-        assert_eq!(status, "unknown");
+        assert_eq!(status, "not-probed");
     }
 
     #[test]
-    fn test_probe_single_classifies_wss_as_unknown() {
+    fn test_probe_single_classifies_wss_as_not_probed() {
         let rt = tokio::runtime::Runtime::new().expect("create tokio runtime");
         let client = reqwest::Client::new();
         let status = rt.block_on(probe_single(&client, "wss://tracker.example.com/announce"));
-        assert_eq!(status, "unknown");
+        assert_eq!(status, "not-probed");
     }
 
     #[test]
-    fn test_probe_single_classifies_ws_as_unknown() {
+    fn test_probe_single_classifies_ws_as_not_probed() {
         let rt = tokio::runtime::Runtime::new().expect("create tokio runtime");
         let client = reqwest::Client::new();
         let status = rt.block_on(probe_single(&client, "ws://tracker.example.com/announce"));
-        assert_eq!(status, "unknown");
+        assert_eq!(status, "not-probed");
     }
 
     #[test]
@@ -242,26 +246,34 @@ mod tests {
     }
 
     #[test]
-    fn classify_udp_as_unknown() {
+    fn classify_udp_as_not_probed() {
         assert_eq!(
             classify_tracker_protocol("udp://tracker.example.com:6969"),
-            "unknown"
+            "not-probed"
         );
     }
 
     #[test]
-    fn classify_wss_as_unknown() {
+    fn classify_uppercase_udp_as_not_probed() {
+        assert_eq!(
+            classify_tracker_protocol("UDP://tracker.example.com:6969"),
+            "not-probed"
+        );
+    }
+
+    #[test]
+    fn classify_wss_as_not_probed() {
         assert_eq!(
             classify_tracker_protocol("wss://tracker.example.com/announce"),
-            "unknown"
+            "not-probed"
         );
     }
 
     #[test]
-    fn classify_ws_as_unknown() {
+    fn classify_ws_as_not_probed() {
         assert_eq!(
             classify_tracker_protocol("ws://tracker.example.com/announce"),
-            "unknown"
+            "not-probed"
         );
     }
 

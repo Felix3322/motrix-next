@@ -15,6 +15,10 @@ describe('parseTrackerProtocol', () => {
     expect(parseTrackerProtocol('udp://tracker.example.com:6969')).toBe('udp')
   })
 
+  it('normalizes protocol casing', () => {
+    expect(parseTrackerProtocol('UDP://tracker.example.com:6969')).toBe('udp')
+  })
+
   it('detects wss protocol', () => {
     expect(parseTrackerProtocol('wss://tracker.example.com/announce')).toBe('wss')
   })
@@ -63,9 +67,21 @@ describe('buildTrackerRows', () => {
     expect(urls).toEqual(['http://tracker.com/announce', 'udp://other.com:6969'])
   })
 
-  it('initializes all statuses as unknown', () => {
+  it('initializes probeable trackers as unknown', () => {
     const list = [['http://tracker.com/announce']]
     const rows = buildTrackerRows(list)
     expect(rows[0].status).toBe('unknown')
+  })
+
+  it('marks UDP and WebSocket trackers as not probed', () => {
+    const list = [['udp://tracker.com:6969/announce', 'wss://tracker.com/announce']]
+    const rows = buildTrackerRows(list)
+    expect(rows.map((row) => row.status)).toEqual(['not-probed', 'not-probed'])
+  })
+
+  it('marks uppercase UDP trackers as not probed', () => {
+    const list = [['UDP://tracker.com:6969/announce']]
+    const rows = buildTrackerRows(list)
+    expect(rows[0].status).toBe('not-probed')
   })
 })

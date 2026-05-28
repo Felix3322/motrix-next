@@ -11,7 +11,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 import { logger } from '@shared/logger'
 
-export type TrackerStatus = 'checking' | 'online' | 'offline' | 'unknown'
+export type TrackerStatus = 'checking' | 'online' | 'offline' | 'unknown' | 'not-probed'
 
 export interface TrackerRow {
   url: string
@@ -32,7 +32,11 @@ interface TrackerProbeEvent {
  */
 export function parseTrackerProtocol(url: string): string {
   const match = url.match(/^(\w+):\/\//)
-  return match ? match[1] : 'unknown'
+  return match ? match[1].toLowerCase() : 'unknown'
+}
+
+function isTrackerProbeable(protocol: string): boolean {
+  return !['udp', 'ws', 'wss'].includes(protocol)
 }
 
 /**
@@ -50,11 +54,12 @@ export function buildTrackerRows(announceList: string[][] | undefined): TrackerR
     for (const url of tierUrls) {
       if (seen.has(url)) continue
       seen.add(url)
+      const protocol = parseTrackerProtocol(url)
       rows.push({
         url,
         tier: tierIndex + 1,
-        protocol: parseTrackerProtocol(url),
-        status: 'unknown',
+        protocol,
+        status: isTrackerProbeable(protocol) ? 'unknown' : 'not-probed',
       })
     }
   })
@@ -104,7 +109,8 @@ export function useTrackerProbe() {
       // Mark any remaining "checking" URLs as unknown on error
       for (const url of urls) {
         if (statuses.value[url] === 'checking') {
-          statuses.value[url] = 'unknown'
+          const protocol = parseTrackerProtocol(url)
+          statuses.value[url] = isTrackerProbeable(protocol) ? 'unknown' : 'not-probed'
         }
       }
     } finally {
@@ -120,7 +126,8 @@ export function useTrackerProbe() {
     probeGeneration++
     for (const url of Object.keys(statuses.value)) {
       if (statuses.value[url] === 'checking') {
-        statuses.value[url] = 'unknown'
+        const protocol = parseTrackerProtocol(url)
+        statuses.value[url] = isTrackerProbeable(protocol) ? 'unknown' : 'not-probed'
       }
     }
     probing.value = false
