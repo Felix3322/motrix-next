@@ -39,6 +39,10 @@ describe('changeKeysToKebabCase', () => {
       'ed2k-share-files': ['/tmp/shared.bin'],
     })
   })
+
+  it('keeps Aria2 as one engine name prefix', () => {
+    expect(changeKeysToKebabCase({ aria2LogLevel: 'warn' })).toEqual({ 'aria2-log-level': 'warn' })
+  })
 })
 
 describe('changeKeysCase', () => {
@@ -140,6 +144,7 @@ describe('checkIsNeedRestart', () => {
     expect(checkIsNeedRestart({ btLocalPeerDiscoveryEnabled: false })).toBe(true)
     expect(checkIsNeedRestart({ btForceEncryption: true })).toBe(true)
     expect(checkIsNeedRestart({ btMaxPeers: 256 })).toBe(true)
+    expect(checkIsNeedRestart({ aria2LogLevel: 'info' })).toBe(true)
   })
   it('returns true for ED2K restart keys from AppConfig camelCase fields', () => {
     expect(checkIsNeedRestart({ ed2kListenPort: 4663 })).toBe(true)

@@ -22,7 +22,11 @@ export const changeKeysToCamelCase = (obj: Record<string, unknown> = {}): Record
 }
 
 export const changeKeysToKebabCase = (obj: Record<string, unknown> = {}): Record<string, unknown> => {
-  return changeKeysCase(obj, (key) => kebabCase(key).replace(/^ed-2-k-/, 'ed2k-'))
+  return changeKeysCase(obj, (key) =>
+    kebabCase(key)
+      .replace(/^ed-2-k-/, 'ed2k-')
+      .replace(/^aria-2-/, 'aria2-'),
+  )
 }
 
 export const validateNumber = (n: unknown): boolean => {

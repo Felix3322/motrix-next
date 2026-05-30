@@ -229,7 +229,7 @@ const { form, isDirty, handleSave, handleReset, resetSnapshot } = usePreferenceF
       await restartEngine({ port, secret })
     }
 
-    // Log level changes need a full app relaunch (not engine restart),
+    // Motrix log level changes need a full app relaunch,
     // because tauri-plugin-log is configured at process startup.
     if (changed.logLevel !== undefined && changed.logLevel !== prevConfig.logLevel) {
       dialog.info({
@@ -646,7 +646,18 @@ onMounted(async () => {
       </NFormItem>
       <NFormItem :label="t('preferences.log-level')">
         <div class="log-level-row">
-          <NSelect v-model:value="form.logLevel" :options="logLevelOptions" style="width: 110px" />
+          <div class="log-level-control">
+            <span class="log-level-control__label">{{ t('preferences.motrix-next') }}</span>
+            <NSelect v-model:value="form.logLevel" :options="logLevelOptions" style="width: 110px" />
+          </div>
+          <div class="log-level-control">
+            <span class="log-level-control__label">{{ t('preferences.aria2-next') }}</span>
+            <NSelect v-model:value="form.aria2LogLevel" :options="logLevelOptions" style="width: 110px" />
+          </div>
+        </div>
+      </NFormItem>
+      <NFormItem :show-label="false">
+        <div class="log-action-row">
           <NButton class="ghost-btn--primary" ghost :loading="exportingLogs" @click="handleExportLogs">
             <template #icon>
               <NIcon><DownloadOutline /></NIcon>
@@ -660,12 +671,6 @@ onMounted(async () => {
             {{ t('preferences.clear-log') }}
           </NButton>
         </div>
-      </NFormItem>
-      <NFormItem>
-        <template #label>
-          <PreferenceHintLabel :label="t('preferences.aria2-logs')" :hint="t('preferences.aria2-logs-hint')" />
-        </template>
-        <NSwitch v-model:value="form.aria2LogsEnabled" />
       </NFormItem>
 
       <NDivider title-placement="left">{{ t('preferences.history-section') }}</NDivider>
@@ -861,9 +866,26 @@ onMounted(async () => {
   transition: border-color 0.35s cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* ── Log-level row — select + export button inline ───────────────── */
 .log-level-row {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+.log-level-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.log-level-control__label {
+  color: var(--m3-on-surface);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.log-action-row {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   width: 100%;

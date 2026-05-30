@@ -70,6 +70,7 @@ describe('hydrateAppConfig', () => {
       colorScheme: 'missing-scheme',
       updateChannel: 'nightly' as AppConfig['updateChannel'],
       logLevel: 'verbose',
+      aria2LogLevel: 'verbose',
       fileAllocation: 'magic',
     })
 
@@ -77,9 +78,10 @@ describe('hydrateAppConfig', () => {
     expect(result.config.colorScheme).toBe(DEFAULT_APP_CONFIG.colorScheme)
     expect(result.config.updateChannel).toBe(DEFAULT_APP_CONFIG.updateChannel)
     expect(result.config.logLevel).toBe(DEFAULT_APP_CONFIG.logLevel)
+    expect(result.config.aria2LogLevel).toBe(DEFAULT_APP_CONFIG.aria2LogLevel)
     expect(result.config.fileAllocation).toBe(DEFAULT_APP_CONFIG.fileAllocation)
     expect(result.repairs).toEqual(
-      expect.arrayContaining(['theme', 'colorScheme', 'updateChannel', 'logLevel', 'fileAllocation']),
+      expect.arrayContaining(['theme', 'colorScheme', 'updateChannel', 'logLevel', 'aria2LogLevel', 'fileAllocation']),
     )
   })
 
@@ -141,6 +143,7 @@ describe('hydrateAppConfig', () => {
     expect(COLOR_SCHEMES.some((scheme) => scheme.id === DEFAULT_APP_CONFIG.colorScheme)).toBe(true)
     expect(UPDATE_CHANNELS).toContain(DEFAULT_APP_CONFIG.updateChannel)
     expect(LOG_LEVELS).toContain(DEFAULT_APP_CONFIG.logLevel)
+    expect(LOG_LEVELS).toContain(DEFAULT_APP_CONFIG.aria2LogLevel)
     expect(FILE_ALLOCATION_OPTIONS).toContain(DEFAULT_APP_CONFIG.fileAllocation)
     expect(DEFAULT_APP_CONFIG.proxy.scope).toEqual(PROXY_SCOPE_OPTIONS)
   })

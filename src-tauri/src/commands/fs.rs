@@ -30,22 +30,18 @@ fn managed_log_file_kind(name: &str) -> Option<ManagedLogFileKind> {
     }
 }
 
-fn diagnostic_log_zip_path(name: &str, aria2_logs_enabled: bool) -> Option<String> {
+fn diagnostic_log_zip_path(name: &str) -> Option<String> {
     if name == "motrix-next.log" {
         Some(format!("motrix-next/{name}"))
-    } else if aria2_logs_enabled && (name == "aria2-next.log" || is_aria2_rotated_log_file(name)) {
+    } else if name == "aria2-next.log" || is_aria2_rotated_log_file(name) {
         Some(format!("aria2-next/{name}"))
     } else {
         None
     }
 }
 
-fn should_export_log_file(
-    path: &Path,
-    name: &str,
-    aria2_logs_enabled: bool,
-) -> Result<bool, AppError> {
-    let Some(_) = diagnostic_log_zip_path(name, aria2_logs_enabled) else {
+fn should_export_log_file(path: &Path, name: &str) -> Result<bool, AppError> {
+    let Some(_) = diagnostic_log_zip_path(name) else {
         return Ok(false);
     };
     let metadata = std::fs::metadata(path)
@@ -53,11 +49,15 @@ fn should_export_log_file(
     Ok(metadata.len() > 0)
 }
 
-fn config_aria2_logs_enabled(raw: &Value) -> bool {
-    raw.get("preferences")
-        .and_then(|prefs| prefs.get("aria2LogsEnabled"))
-        .and_then(Value::as_bool)
-        .unwrap_or(true)
+fn config_aria2_log_level(raw: Option<&Value>) -> &str {
+    raw.and_then(|config| {
+        config
+            .get("preferences")
+            .and_then(|prefs| prefs.get("aria2LogLevel"))
+            .and_then(Value::as_str)
+    })
+    .filter(|level| matches!(*level, "error" | "warn" | "info" | "debug"))
+    .unwrap_or("warn")
 }
 
 fn redact_url_credentials(value: &str) -> String {
@@ -199,7 +199,7 @@ pub fn clear_log_file(app: AppHandle) -> Result<(), AppError> {
 /// on the frontend). Includes:
 /// - `system-info.json` with enriched machine/runtime context for diagnostics
 /// - Motrix Next logs under `motrix-next/`
-/// - Aria2 Next logs under `aria2-next/` when enabled
+/// - Aria2 Next logs under `aria2-next/`
 /// - `config.json` user configuration snapshot for issue reproduction
 ///
 /// Returns the full path to the created ZIP file.
@@ -244,11 +244,6 @@ pub async fn export_diagnostic_logs(app: AppHandle, save_path: String) -> Result
     } else {
         None
     };
-    let aria2_logs_enabled = raw_config
-        .as_ref()
-        .map(config_aria2_logs_enabled)
-        .unwrap_or(false);
-
     // ── System info: enriched machine context for diagnostics ────────
     let pkg = app.package_info();
     let engine_pid = app
@@ -265,8 +260,8 @@ pub async fn export_diagnostic_logs(app: AppHandle, save_path: String) -> Result
         "locale": sys_locale::get_locale().unwrap_or_default(),
         "app_version": pkg.version.to_string(),
         "app_name": pkg.name,
-        "log_level": format!("{}", crate::read_log_level()),
-        "aria2_next_logs_enabled": aria2_logs_enabled,
+        "motrix_next_log_level": format!("{}", crate::read_log_level()),
+        "aria2_next_log_level": config_aria2_log_level(raw_config.as_ref()),
         "engine_pid": engine_pid,
         "webkit_dmabuf_disabled": std::env::var("WEBKIT_DISABLE_DMABUF_RENDERER")
             .unwrap_or_default(),
@@ -289,10 +284,10 @@ pub async fn export_diagnostic_logs(app: AppHandle, save_path: String) -> Result
         let path = entry.path();
         if path.is_file() {
             let name = path.file_name().unwrap_or_default().to_string_lossy();
-            let Some(zip_name) = diagnostic_log_zip_path(&name, aria2_logs_enabled) else {
+            let Some(zip_name) = diagnostic_log_zip_path(&name) else {
                 continue;
             };
-            if !should_export_log_file(&path, &name, aria2_logs_enabled)? {
+            if !should_export_log_file(&path, &name)? {
                 continue;
             }
             let content = std::fs::read(&path)
@@ -376,32 +371,22 @@ mod export_tests {
     }
 
     #[test]
-    fn diagnostic_log_zip_path_separates_motrix_and_enabled_aria2_logs() {
+    fn diagnostic_log_zip_path_separates_motrix_and_aria2_logs_without_export_toggle() {
         assert_eq!(
-            diagnostic_log_zip_path("motrix-next.log", true),
+            diagnostic_log_zip_path("motrix-next.log"),
             Some("motrix-next/motrix-next.log".to_string())
         );
         assert_eq!(
-            diagnostic_log_zip_path("aria2-next.log", true),
+            diagnostic_log_zip_path("aria2-next.log"),
             Some("aria2-next/aria2-next.log".to_string())
         );
         assert_eq!(
-            diagnostic_log_zip_path("aria2-next.1.log", true),
+            diagnostic_log_zip_path("aria2-next.1.log"),
             Some("aria2-next/aria2-next.1.log".to_string())
         );
-        assert_eq!(diagnostic_log_zip_path("other.log", true), None);
-        assert_eq!(diagnostic_log_zip_path("aria2-next.log.1", true), None);
-        assert_eq!(diagnostic_log_zip_path("motrix-next.log.1", true), None);
-    }
-
-    #[test]
-    fn diagnostic_log_zip_path_omits_aria2_logs_when_disabled() {
-        assert_eq!(
-            diagnostic_log_zip_path("motrix-next.log", false),
-            Some("motrix-next/motrix-next.log".to_string())
-        );
-        assert_eq!(diagnostic_log_zip_path("aria2-next.log", false), None);
-        assert_eq!(diagnostic_log_zip_path("aria2-next.1.log", false), None);
+        assert_eq!(diagnostic_log_zip_path("other.log"), None);
+        assert_eq!(diagnostic_log_zip_path("aria2-next.log.1"), None);
+        assert_eq!(diagnostic_log_zip_path("motrix-next.log.1"), None);
     }
 
     #[test]
@@ -471,22 +456,32 @@ mod export_tests {
         std::fs::write(&non_empty, "log").expect("non-empty log");
         std::fs::write(&other, "log").expect("other log");
 
-        assert!(!should_export_log_file(&empty, "aria2-next.log", true).expect("empty export"));
-        assert!(
-            should_export_log_file(&non_empty, "motrix-next.log", true).expect("non-empty export")
-        );
-        assert!(!should_export_log_file(&other, "other.log", true).expect("other export"));
+        assert!(!should_export_log_file(&empty, "aria2-next.log").expect("empty export"));
+        assert!(should_export_log_file(&non_empty, "motrix-next.log").expect("non-empty export"));
+        assert!(!should_export_log_file(&other, "other.log").expect("other export"));
     }
 
     #[test]
-    fn config_aria2_logs_enabled_defaults_to_true() {
-        assert!(config_aria2_logs_enabled(&serde_json::json!({})));
-        assert!(!config_aria2_logs_enabled(&serde_json::json!({
-            "preferences": { "aria2LogsEnabled": false }
-        })));
-        assert!(config_aria2_logs_enabled(&serde_json::json!({
-            "preferences": { "aria2LogsEnabled": true }
-        })));
+    fn config_aria2_log_level_reads_current_field_only() {
+        assert_eq!(config_aria2_log_level(None), "warn");
+        assert_eq!(
+            config_aria2_log_level(Some(&serde_json::json!({
+                "preferences": { "aria2LogLevel": "debug" }
+            }))),
+            "debug"
+        );
+        assert_eq!(
+            config_aria2_log_level(Some(&serde_json::json!({
+                "preferences": { "aria2LogLevel": "verbose" }
+            }))),
+            "warn"
+        );
+        assert_eq!(
+            config_aria2_log_level(Some(&serde_json::json!({
+                "preferences": { "aria2LogsEnabled": false }
+            }))),
+            "warn"
+        );
     }
 }
 

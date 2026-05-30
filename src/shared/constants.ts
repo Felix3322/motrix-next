@@ -353,8 +353,8 @@ export const DEFAULT_APP_CONFIG = {
   silentAutoSubmitFromExtension: true,
   userAgent:
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
-  logLevel: 'debug', // shared Motrix Next and Aria2 Next log level
-  aria2LogsEnabled: true,
+  logLevel: 'debug',
+  aria2LogLevel: 'warn',
   cookie: '',
   runMode: '',
   engineBinPath: '',
