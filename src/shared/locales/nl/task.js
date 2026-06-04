@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Lijst vernieuwd',
   'copy-link': 'Link kopiëren',
   'copy-link-success': 'Link gekopieerd',
+  'copy-link-unavailable': 'Link niet beschikbaar',
   'add-task-success': 'Taak succesvol toegevoegd',
   'remove-record': 'Record verwijderen',
   'remove-record-confirm': 'Record van "{taskName}" verwijderen?',

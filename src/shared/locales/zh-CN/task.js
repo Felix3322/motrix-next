@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': '列表已刷新',
   'copy-link': '复制链接',
   'copy-link-success': '链接已复制',
+  'copy-link-unavailable': '链接不可用',
   'add-task-success': '任务添加成功',
   'remove-record': '移除记录',
   'remove-record-confirm': '确定移除「{taskName}」的下载记录？',

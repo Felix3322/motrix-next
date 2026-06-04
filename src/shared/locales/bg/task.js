@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Списъкът е обновен',
   'copy-link': 'Копирай връзка',
   'copy-link-success': 'Връзката е копирана',
+  'copy-link-unavailable': 'Връзката не е налична',
   'add-task-success': 'Задачата е добавена успешно',
   'remove-record': 'Премахни запис',
   'remove-record-confirm': 'Да се премахне записът на „{taskName}"?',

@@ -77,6 +77,8 @@ pub struct TaskEvent {
     pub total_length: String,
     pub completed_length: String,
     pub info_hash: Option<String>,
+    pub magnet_link: Option<String>,
+    pub ed2k_link: Option<String>,
     pub is_bt: bool,
     pub is_ed2k: bool,
     pub sharing_kind: Option<&'static str>,
@@ -96,6 +98,16 @@ impl TaskEvent {
         let info_hash = task.info_hash.clone().filter(|h| !h.is_empty());
         let is_bt = task.bittorrent.is_some();
         let is_ed2k = task.ed2k.is_some();
+        let magnet_link = task
+            .bittorrent
+            .as_ref()
+            .and_then(|bt| bt.magnet_link.clone())
+            .filter(|value| !value.is_empty());
+        let ed2k_link = task
+            .ed2k
+            .as_ref()
+            .and_then(|ed2k| ed2k.ed2k_link.clone())
+            .filter(|value| !value.is_empty());
 
         let files: Vec<TaskEventFile> = task
             .files
@@ -124,6 +136,8 @@ impl TaskEvent {
             total_length: task.total_length.clone(),
             completed_length: task.completed_length.clone(),
             info_hash,
+            magnet_link,
+            ed2k_link,
             is_bt,
             is_ed2k,
             sharing_kind: sharing_kind(task).map(SharingKind::as_str),
@@ -192,6 +206,18 @@ fn build_history_meta_json(event: &TaskEvent) -> Option<String> {
         meta.insert(
             "infoHash".to_string(),
             serde_json::Value::String(hash.clone()),
+        );
+    }
+    if let Some(ref magnet_link) = event.magnet_link {
+        meta.insert(
+            "magnetLink".to_string(),
+            serde_json::Value::String(magnet_link.clone()),
+        );
+    }
+    if let Some(ref ed2k_link) = event.ed2k_link {
+        meta.insert(
+            "ed2kLink".to_string(),
+            serde_json::Value::String(ed2k_link.clone()),
         );
     }
 
@@ -753,6 +779,7 @@ mod tests {
                 name: "Ubuntu.iso".to_string(),
             }),
             announce_list: Some(vec![vec!["udp://tracker.example.com:6969".to_string()]]),
+            magnet_link: Some("magnet:?xt=urn:btih:abcdef1234567890&dn=Ubuntu.iso".to_string()),
             creation_date: None,
             comment: None,
             mode: None,
@@ -771,6 +798,9 @@ mod tests {
     fn make_ed2k_task(gid: &str, status: &str, sharing: bool) -> Aria2Task {
         let mut task = make_task(gid, status);
         task.ed2k = Some(Aria2Ed2kInfo {
+            ed2k_link: Some(
+                "ed2k://|file|ed2k.bin|1024|31313131313131313131313131313131|/".to_string(),
+            ),
             hash: Some("ed2khash".to_string()),
             name: Some("ed2k.bin".to_string()),
             length: Some("1024".to_string()),
@@ -840,6 +870,7 @@ mod tests {
                     vec!["udp://tracker1.example.com:6969".to_string()],
                     vec!["udp://tracker2.example.com:6969".to_string()],
                 ]),
+                magnet_link: Some("magnet:?xt=urn:btih:deadbeef&dn=MyTorrent".to_string()),
                 creation_date: None,
                 comment: None,
                 mode: Some("multi".to_string()),
@@ -873,6 +904,7 @@ mod tests {
         task.bittorrent = Some(Aria2BtInfo {
             info: None,
             announce_list: None,
+            magnet_link: None,
             creation_date: None,
             comment: None,
             mode: None,
@@ -1335,6 +1367,32 @@ mod tests {
         let al = meta["announceList"].as_array().unwrap();
         assert_eq!(al.len(), 1);
         assert_eq!(al[0][0], "udp://tracker.example.com:6969");
+    }
+
+    #[test]
+    fn bt_meta_contains_engine_magnet_link() {
+        let task = make_bt_task("g1", "active", true);
+        let event = TaskEvent::from_aria2(&task);
+        let record = build_history_record(&event, events::SHARING_COMPLETE);
+
+        let meta: serde_json::Value = serde_json::from_str(record.meta.as_ref().unwrap()).unwrap();
+        assert_eq!(
+            meta["magnetLink"],
+            "magnet:?xt=urn:btih:abcdef1234567890&dn=Ubuntu.iso"
+        );
+    }
+
+    #[test]
+    fn ed2k_meta_contains_engine_ed2k_link() {
+        let task = make_ed2k_task("g1", "active", true);
+        let event = TaskEvent::from_aria2(&task);
+        let record = build_history_record(&event, events::SHARING_COMPLETE);
+
+        let meta: serde_json::Value = serde_json::from_str(record.meta.as_ref().unwrap()).unwrap();
+        assert_eq!(
+            meta["ed2kLink"],
+            "ed2k://|file|ed2k.bin|1024|31313131313131313131313131313131|/"
+        );
     }
 
     #[test]

@@ -242,6 +242,7 @@ export default {
   'refresh-list-success': 'List refreshed',
   'copy-link': 'Link Copy करें',
   'copy-link-success': 'Link copied',
+  'copy-link-unavailable': 'Link unavailable',
   'add-task-success': 'Task सफलतापूर्वक जोड़ा गया',
   'remove-record': 'Record हटाएं',
   'remove-record-confirm': '"{taskName}" का download record हटाएं?',

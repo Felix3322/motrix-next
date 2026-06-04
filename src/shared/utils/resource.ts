@@ -44,8 +44,7 @@ function decodeBase64Utf8(payload: string): string {
 }
 
 export const splitTaskLinks = (links = ''): string[] => {
-  const temp = compact(splitTextRows(links))
-  return temp.map((item) => decodeThunderLink(item))
+  return compact(splitTextRows(links))
 }
 
 /**

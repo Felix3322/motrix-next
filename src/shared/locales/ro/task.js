@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Lista a fost actualizată',
   'copy-link': 'Copiază linkul',
   'copy-link-success': 'Link copiat',
+  'copy-link-unavailable': 'Link indisponibil',
   'add-task-success': 'Sarcină adăugată cu succes',
   'remove-record': 'Elimină înregistrarea',
   'remove-record-confirm': 'Eliminați înregistrarea „{taskName}"?',

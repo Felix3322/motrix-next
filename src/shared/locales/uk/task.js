@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Список оновлено',
   'copy-link': 'Копіювати посилання',
   'copy-link-success': 'Посилання скопійовано',
+  'copy-link-unavailable': 'Посилання недоступне',
   'add-task-success': 'Завдання успішно додано',
   'remove-record': 'Видалити запис',
   'remove-record-confirm': 'Видалити запис «{taskName}»?',

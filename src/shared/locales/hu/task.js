@@ -242,6 +242,7 @@ export default {
   'refresh-list-success': 'Lista frissítve',
   'copy-link': 'Link másolása',
   'copy-link-success': 'Link másolva',
+  'copy-link-unavailable': 'A link nem érhető el',
   'add-task-success': 'Feladat sikeresen hozzáadva',
   'remove-record': 'Bejegyzés eltávolítása',
   'remove-record-confirm': 'Eltávolítja a(z) „{taskName}" bejegyzést?',

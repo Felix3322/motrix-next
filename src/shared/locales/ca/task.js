@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Llista actualitzada',
   'copy-link': "Copia l'enllaç",
   'copy-link-success': 'Enllaç copiat',
+  'copy-link-unavailable': 'Enllaç no disponible',
   'add-task-success': 'Tasca afegida correctament',
   'remove-record': 'Eliminar registre',
   'remove-record-confirm': 'Eliminar el registre de «{taskName}»?',

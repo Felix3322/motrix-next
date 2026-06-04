@@ -13,7 +13,6 @@ import {
   getTaskSharingKind,
   getFileNameFromFile,
   getTaskDisplayName,
-  buildMagnetLink,
   getTaskUri,
   checkTaskTitleIsEmpty,
   mergeTaskResult,
@@ -461,70 +460,23 @@ describe('task sharing state', () => {
   })
 })
 
-describe('buildMagnetLink', () => {
-  it('builds basic magnet link with infoHash', () => {
-    const task = createMockTask({ infoHash: 'abc123', bittorrent: {} })
-    const result = buildMagnetLink(task)
-    expect(result).toBe('magnet:?xt=urn:btih:abc123')
-  })
-
-  it('includes display name when BT info has name', () => {
-    const task = createMockTask({
-      infoHash: 'abc123',
-      bittorrent: { info: { name: 'My File' } },
-    })
-    const result = buildMagnetLink(task)
-    expect(result).toContain('dn=My%20File')
-  })
-
-  it('includes trackers when withTracker is true', () => {
-    const task = createMockTask({
-      infoHash: 'abc123',
-      bittorrent: {
-        info: { name: 'test' },
-        announceList: [['http://tracker1.com', 'http://tracker2.com']],
-      },
-    })
-    const result = buildMagnetLink(task, true)
-    expect(result).toContain('tr=http%3A%2F%2Ftracker1.com')
-    expect(result).toContain('tr=http%3A%2F%2Ftracker2.com')
-  })
-
-  it('excludes trackers already in btTracker list', () => {
-    const task = createMockTask({
-      infoHash: 'abc123',
-      bittorrent: {
-        info: { name: 'test' },
-        announceList: [['http://tracker1.com', 'http://tracker2.com']],
-      },
-    })
-    const result = buildMagnetLink(task, true, ['http://tracker1.com'])
-    expect(result).not.toContain('tr=http%3A%2F%2Ftracker1.com')
-    expect(result).toContain('tr=http%3A%2F%2Ftracker2.com')
-  })
-
-  it('does not include trackers when withTracker is false', () => {
-    const task = createMockTask({
-      infoHash: 'abc123',
-      bittorrent: {
-        info: { name: 'test' },
-        announceList: [['http://tracker1.com']],
-      },
-    })
-    const result = buildMagnetLink(task, false)
-    expect(result).not.toContain('tr=')
-  })
-})
-
 describe('getTaskUri', () => {
-  it('returns magnet link for BT task', () => {
+  it('returns engine-provided magnet link for BT task', () => {
     const task = createMockTask({
-      infoHash: 'abc123',
-      bittorrent: { info: { name: 'test' } },
+      bittorrent: { magnetLink: 'magnet:?xt=urn:btih:abc123&dn=test' },
       files: [],
     })
-    const result = getTaskUri(task)
-    expect(result).toContain('magnet:?xt=urn:btih:abc123')
+    expect(getTaskUri(task)).toBe('magnet:?xt=urn:btih:abc123&dn=test')
+  })
+
+  it('returns engine-provided ED2K file link for ED2K task', () => {
+    const task = createMockTask({
+      ed2k: {
+        ed2kLink: 'ed2k://|file|movie.mkv|42|31313131313131313131313131313131|/',
+      },
+      files: [createMockFile({ uris: [] })],
+    })
+    expect(getTaskUri(task)).toBe('ed2k://|file|movie.mkv|42|31313131313131313131313131313131|/')
   })
 
   it('returns first URI for single-file HTTP task', () => {
@@ -545,7 +497,7 @@ describe('getTaskUri', () => {
     expect(getTaskUri(task)).toBe('')
   })
 
-  it('returns empty for multi-file HTTP task', () => {
+  it('returns first URI for multi-file HTTP task', () => {
     const task = createMockTask({
       files: [createMockFile(), createMockFile({ index: '2' })],
     })
@@ -723,15 +675,21 @@ describe('resolveOpenTarget', () => {
 // ── getRestartDescriptors ────────────────────────────────────────────
 
 describe('getRestartDescriptors', () => {
-  it('returns [[magnet]] for BT tasks', () => {
+  it('returns engine-provided magnet group for BT tasks', () => {
     const task = createMockTask({
-      infoHash: 'abc123',
-      bittorrent: { info: { name: 'test' } },
+      bittorrent: { magnetLink: 'magnet:?xt=urn:btih:abc123&dn=test' },
       files: [],
     })
     const result = getRestartDescriptors(task, true)
-    expect(result).toHaveLength(1)
-    expect(result[0][0]).toContain('magnet:?xt=urn:btih:abc123')
+    expect(result).toEqual([['magnet:?xt=urn:btih:abc123&dn=test']])
+  })
+
+  it('returns engine-provided ED2K group for ED2K tasks', () => {
+    const task = createMockTask({
+      ed2k: { ed2kLink: 'ed2k://|file|movie.mkv|42|31313131313131313131313131313131|/' },
+      files: [createMockFile({ uris: [] })],
+    })
+    expect(getRestartDescriptors(task)).toEqual([['ed2k://|file|movie.mkv|42|31313131313131313131313131313131|/']])
   })
 
   it('returns one group per file with all mirror URIs for HTTP tasks', () => {

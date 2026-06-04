@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'تم تحديث القائمة',
   'copy-link': 'نسخ الرابط',
   'copy-link-success': 'تم نسخ الرابط',
+  'copy-link-unavailable': 'الرابط غير متاح',
   'add-task-success': 'تمت إضافة المهمة بنجاح',
   'remove-record': 'إزالة السجل',
   'remove-record-confirm': 'إزالة سجل "{taskName}"؟',

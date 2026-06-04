@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Daftar diperbarui',
   'copy-link': 'Salin tautan',
   'copy-link-success': 'Tautan disalin',
+  'copy-link-unavailable': 'Tautan tidak tersedia',
   'add-task-success': 'Tugas berhasil ditambahkan',
   'remove-record': 'Hapus catatan',
   'remove-record-confirm': 'Hapus catatan "{taskName}"?',

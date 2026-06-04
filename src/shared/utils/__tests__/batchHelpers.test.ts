@@ -85,24 +85,19 @@ describe('normalizeUriLines', () => {
     expect(normalizeUriLines(full)).toEqual([full])
   })
 
-  it('decodes Thunder links before returning URI lines', () => {
+  it('keeps Thunder links wrapped for engine parsing', () => {
     const thunder = 'thunder://' + btoa('AAhttps://example.com/file.zipZZ')
-    expect(normalizeUriLines(thunder)).toEqual(['https://example.com/file.zip'])
+    expect(normalizeUriLines(thunder)).toEqual([thunder])
   })
 
-  it('decodes mixed-case Thunder schemes before returning URI lines', () => {
+  it('keeps mixed-case Thunder schemes wrapped for engine parsing', () => {
     const thunder = 'Thunder://' + btoa('AAhttps://example.com/file.zipZZ')
-    expect(normalizeUriLines(thunder)).toEqual(['https://example.com/file.zip'])
+    expect(normalizeUriLines(thunder)).toEqual([thunder])
   })
 
-  it('deduplicates Thunder links by their decoded URI', () => {
+  it('deduplicates Thunder links by exact normalized line', () => {
     const thunder = 'thunder://' + btoa('AAhttps://example.com/file.zipZZ')
-    expect(normalizeUriLines(`https://example.com/file.zip\n${thunder}`)).toEqual(['https://example.com/file.zip'])
-  })
-
-  it('decodes URL-encoded Thunder payloads before deduplicating URI lines', () => {
-    const thunder = 'thunder://' + encodeURIComponent(btoa('AAhttps://example.com/file.zipZZ'))
-    expect(normalizeUriLines(`https://example.com/file.zip\n${thunder}`)).toEqual(['https://example.com/file.zip'])
+    expect(normalizeUriLines(`${thunder}\n${thunder}`)).toEqual([thunder])
   })
 })
 
@@ -146,11 +141,11 @@ describe('mergeUriLines', () => {
     )
   })
 
-  it('decodes Thunder links in incoming payloads before merging', () => {
+  it('keeps Thunder links wrapped when merging incoming payloads', () => {
     const thunder = 'thunder://' + btoa('AAhttps://example.com/file.zipZZ')
     const merged = mergeUriLines('', [thunder])
 
-    expect(merged).toBe('https://example.com/file.zip')
+    expect(merged).toBe(thunder)
   })
 })
 

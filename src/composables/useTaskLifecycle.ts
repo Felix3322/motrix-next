@@ -27,6 +27,8 @@ export function isMetadataTask(task: Aria2Task): boolean {
 export function buildHistoryMeta(task: Aria2Task): HistoryMeta {
   const meta: HistoryMeta = {}
   if (task.infoHash) meta.infoHash = task.infoHash
+  if (task.bittorrent?.magnetLink) meta.magnetLink = task.bittorrent.magnetLink
+  if (task.ed2k?.ed2kLink) meta.ed2kLink = task.ed2k.ed2kLink
   if (task.bittorrent?.announceList && task.bittorrent.announceList.length > 0) {
     meta.announceList = task.bittorrent.announceList.map((tier) => [...tier])
   }
@@ -180,8 +182,21 @@ export function historyRecordToTask(record: HistoryRecord): Aria2Task {
   // BT tasks get a bittorrent.info stub so getTaskName() resolves correctly
   if (record.task_type === 'bt') {
     task.bittorrent = { info: { name: record.name } }
+    if (meta.magnetLink) {
+      task.bittorrent.magnetLink = meta.magnetLink
+    }
     if (meta.announceList && meta.announceList.length > 0) {
       task.bittorrent.announceList = meta.announceList.map((tier) => [...tier])
+    }
+  }
+
+  if (record.task_type === 'ed2k') {
+    task.ed2k = {
+      name: record.name,
+      length: totalLength,
+    }
+    if (meta.ed2kLink) {
+      task.ed2k.ed2kLink = meta.ed2kLink
     }
   }
 

@@ -24,6 +24,7 @@ export interface Aria2File {
 export interface Aria2BtInfo {
   info?: { name: string }
   announceList?: string[][]
+  magnetLink?: string
   creationDate?: number
   comment?: string
   mode?: string
@@ -31,6 +32,7 @@ export interface Aria2BtInfo {
 
 /** ED2K metadata attached to a task when the download is an ED2K file link. */
 export interface Aria2Ed2kInfo {
+  ed2kLink?: string
   hash?: string
   name?: string
   length?: string
@@ -537,6 +539,10 @@ export interface HistoryFileSnapshot {
 export interface HistoryMeta {
   /** BT info hash — used for magnet link reconstruction on restart. */
   infoHash?: string
+  /** Engine-serialized BT magnet link. */
+  magnetLink?: string
+  /** Engine-serialized ED2K file link. */
+  ed2kLink?: string
   /** BT announce tiers — used to restore tracker-aware magnet restart links. */
   announceList?: string[][]
   /** Complete file list with all URIs — present when files.length > 1. */

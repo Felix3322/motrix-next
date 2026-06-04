@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Liste yenilendi',
   'copy-link': 'Bağlantıyı kopyala',
   'copy-link-success': 'Bağlantı kopyalandı',
+  'copy-link-unavailable': 'Bağlantı kullanılamıyor',
   'add-task-success': 'Görev başarıyla eklendi',
   'remove-record': 'Kaydı kaldır',
   'remove-record-confirm': '"{taskName}" kaydı kaldırılsın mı?',

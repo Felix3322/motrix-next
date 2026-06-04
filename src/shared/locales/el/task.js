@@ -242,6 +242,7 @@ export default {
   'refresh-list-success': 'Η λίστα ανανεώθηκε',
   'copy-link': 'Αντιγραφή συνδέσμου',
   'copy-link-success': 'Ο σύνδεσμος αντιγράφηκε',
+  'copy-link-unavailable': 'Ο σύνδεσμος δεν είναι διαθέσιμος',
   'add-task-success': 'Η εργασία προστέθηκε επιτυχώς',
   'remove-record': 'Αφαίρεση εγγραφής',
   'remove-record-confirm': 'Αφαίρεση εγγραφής «{taskName}»;',

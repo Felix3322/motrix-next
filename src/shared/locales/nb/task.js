@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Listen er oppdatert',
   'copy-link': 'Kopier lenke',
   'copy-link-success': 'Lenke kopiert',
+  'copy-link-unavailable': 'Lenke utilgjengelig',
   'add-task-success': 'Oppgaven ble lagt til',
   'remove-record': 'Fjern oppføring',
   'remove-record-confirm': 'Fjerne oppføringen for «{taskName}»?',

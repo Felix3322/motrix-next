@@ -7,7 +7,6 @@ import type { BatchItemKind, BatchItem } from '@shared/types'
 import { BARE_INFO_HASH_RE } from '@shared/constants'
 import { decodeMimeWords } from 'lettercoder'
 import sanitizeFilename from 'sanitize-filename'
-import { decodeThunderLink } from './resource'
 
 let nextId = 0
 
@@ -130,7 +129,7 @@ function normalizeInfoHash(line: string): string {
 }
 
 function normalizeUriLine(line: string): string {
-  return normalizeInfoHash(decodeThunderLink(line.trim()))
+  return normalizeInfoHash(line.trim())
 }
 
 function normalizeRawUriLine(line: string): string {
@@ -178,8 +177,8 @@ export function mergeUriLines(existingText: string, incoming: string[]): string 
 
 /**
  * Merge URI lines for display/editing without decoding protocol wrappers.
- * Submission paths must use normalizeUriLines() so Thunder links are decoded
- * before reaching aria2.
+ * Submission paths use normalizeUriLines(); Thunder links stay wrapped because
+ * Aria2 Next owns Thunder parsing.
  */
 export function mergeRawUriLines(existingText: string, incoming: string[]): string {
   const existing = existingText.split('\n').map(normalizeRawUriLine).filter(Boolean)

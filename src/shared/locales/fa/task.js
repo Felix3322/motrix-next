@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'لیست بروزرسانی شد',
   'copy-link': 'کپی لینک',
   'copy-link-success': 'لینک کپی شد',
+  'copy-link-unavailable': 'لینک در دسترس نیست',
   'add-task-success': 'وظیفه با موفقیت اضافه شد',
   'remove-record': 'حذف رکورد',
   'remove-record-confirm': 'رکورد "{taskName}" حذف شود؟',

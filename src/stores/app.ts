@@ -12,7 +12,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { listen } from '@tauri-apps/api/event'
-import { decodeThunderLink } from '@shared/utils'
 import { formatLogFields, logger } from '@shared/logger'
 import { STAT_BASE_INTERVAL, STAT_PER_TASK_INTERVAL, STAT_MIN_INTERVAL, STAT_MAX_INTERVAL } from '@shared/timing'
 import {
@@ -356,7 +355,7 @@ export const useAppStore = defineStore('app', () => {
       } else if (lower.startsWith('ed2k://')) {
         items.push(createBatchItem('uri', url))
       } else if (lower.startsWith('thunder://')) {
-        items.push(createBatchItem('uri', decodeThunderLink(url)))
+        items.push(createBatchItem('uri', url))
       } else if (isRemoteUri) {
         const kind = detectExternalInputKind(url)
         items.push(createBatchItem(kind, url))

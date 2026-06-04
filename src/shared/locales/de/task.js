@@ -242,6 +242,7 @@ export default {
   'refresh-list-success': 'Liste aktualisiert',
   'copy-link': 'Link kopieren',
   'copy-link-success': 'Link kopiert',
+  'copy-link-unavailable': 'Link nicht verfügbar',
   'add-task-success': 'Aufgabe erfolgreich hinzugefügt',
   'remove-record': 'Eintrag entfernen',
   'remove-record-confirm': 'Eintrag von „{taskName}" entfernen?',

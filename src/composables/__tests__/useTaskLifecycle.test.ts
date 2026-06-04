@@ -409,10 +409,11 @@ describe('historyRecordToTask', () => {
     expect(task.bittorrent?.info?.name).toBe('My Torrent')
   })
 
-  it('restores announceList from meta JSON for BT restart descriptors', () => {
+  it('restores engine-provided magnetLink from meta JSON for BT restart descriptors', () => {
     const meta = JSON.stringify({
       infoHash: 'deadbeef1234567890abcdef',
       announceList: [['udp://tracker1.example:80/announce'], ['https://tracker2.example/announce']],
+      magnetLink: 'magnet:?xt=urn:btih:deadbeef1234567890abcdef&dn=My%20Torrent',
     })
     const task = historyRecordToTask(makeRecord({ task_type: 'bt', name: 'My Torrent', meta }))
 
@@ -420,11 +421,20 @@ describe('historyRecordToTask', () => {
       ['udp://tracker1.example:80/announce'],
       ['https://tracker2.example/announce'],
     ])
+    expect(task.bittorrent?.magnetLink).toBe('magnet:?xt=urn:btih:deadbeef1234567890abcdef&dn=My%20Torrent')
     expect(getRestartDescriptors(task, true)).toEqual([
-      [
-        'magnet:?xt=urn:btih:deadbeef1234567890abcdef&dn=My%20Torrent&tr=udp%3A%2F%2Ftracker1.example%3A80%2Fannounce&tr=https%3A%2F%2Ftracker2.example%2Fannounce',
-      ],
+      ['magnet:?xt=urn:btih:deadbeef1234567890abcdef&dn=My%20Torrent'],
     ])
+  })
+
+  it('restores engine-provided ed2kLink from meta JSON for ED2K restart descriptors', () => {
+    const ed2kLink = 'ed2k://|file|movie.mkv|42|31313131313131313131313131313131|/'
+    const task = historyRecordToTask(
+      makeRecord({ task_type: 'ed2k', name: 'movie.mkv', uri: undefined, meta: JSON.stringify({ ed2kLink }) }),
+    )
+
+    expect(task.ed2k?.ed2kLink).toBe(ed2kLink)
+    expect(getRestartDescriptors(task)).toEqual([[ed2kLink]])
   })
 
   it('handles missing/corrupt meta gracefully', () => {
@@ -804,6 +814,27 @@ describe('buildHistoryMeta', () => {
     const meta = buildHistoryMeta(task)
 
     expect(meta.announceList).toEqual([['udp://tracker1.example:80/announce'], ['https://tracker2.example/announce']])
+  })
+
+  it('stores engine-provided magnetLink in structured BT history meta', () => {
+    const task = makeTask({
+      bittorrent: {
+        info: { name: 'Ubuntu 24.04' },
+        magnetLink: 'magnet:?xt=urn:btih:deadbeef&dn=Ubuntu%2024.04',
+      },
+    })
+
+    expect(buildHistoryMeta(task).magnetLink).toBe('magnet:?xt=urn:btih:deadbeef&dn=Ubuntu%2024.04')
+  })
+
+  it('stores engine-provided ed2kLink in structured ED2K history meta', () => {
+    const ed2kLink = 'ed2k://|file|movie.mkv|42|31313131313131313131313131313131|/'
+    const task = makeTask({
+      ed2k: { ed2kLink },
+      files: [{ index: '1', path: '/dl/movie.mkv', length: '42', completedLength: '42', selected: 'true', uris: [] }],
+    })
+
+    expect(buildHistoryMeta(task).ed2kLink).toBe(ed2kLink)
   })
 })
 

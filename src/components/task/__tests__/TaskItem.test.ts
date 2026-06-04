@@ -197,4 +197,23 @@ describe('TaskItem', () => {
     expect(wrapper.find('.task-tags').exists()).toBe(true)
     expect(wrapper.find('.task-status-slot').classes()).not.toContain('task-status-slot--visible')
   })
+
+  it('shows torrent metadata fetching status once', () => {
+    const task = {
+      ...createTask(''),
+      status: 'active',
+      totalLength: '0',
+      completedLength: '0',
+      files: [],
+      bittorrent: {},
+    } satisfies Aria2Task
+
+    const wrapper = mount(TaskItem, {
+      props: {
+        task,
+      },
+    })
+
+    expect(wrapper.text().match(/task\.bt-metadata-fetching/g)).toHaveLength(1)
+  })
 })

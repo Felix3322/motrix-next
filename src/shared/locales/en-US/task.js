@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'List refreshed',
   'copy-link': 'Copy Link',
   'copy-link-success': 'Link copied',
+  'copy-link-unavailable': 'Link unavailable',
   'add-task-success': 'Task added successfully',
   'remove-record': 'Remove Record',
   'remove-record-confirm': 'Remove download record for "{taskName}"?',

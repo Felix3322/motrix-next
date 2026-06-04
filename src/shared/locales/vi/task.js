@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'Đã làm mới danh sách',
   'copy-link': 'Sao chép liên kết',
   'copy-link-success': 'Đã sao chép liên kết',
+  'copy-link-unavailable': 'Liên kết không khả dụng',
   'add-task-success': 'Đã thêm tác vụ thành công',
   'remove-record': 'Xóa bản ghi',
   'remove-record-confirm': 'Xóa bản ghi "{taskName}"?',

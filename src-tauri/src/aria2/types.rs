@@ -33,6 +33,8 @@ pub struct Aria2BtInfo {
     pub info: Option<Aria2BtName>,
     #[serde(default, rename = "announceList")]
     pub announce_list: Option<Vec<Vec<String>>>,
+    #[serde(default, rename = "magnetLink")]
+    pub magnet_link: Option<String>,
     #[serde(default, rename = "creationDate")]
     pub creation_date: Option<u64>,
     #[serde(default)]
@@ -67,6 +69,8 @@ where
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Aria2Ed2kInfo {
+    #[serde(default)]
+    pub ed2k_link: Option<String>,
     #[serde(default)]
     pub hash: Option<String>,
     #[serde(default)]

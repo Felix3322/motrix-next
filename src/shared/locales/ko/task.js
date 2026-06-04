@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': '목록을 새로고침했습니다',
   'copy-link': '링크 복사',
   'copy-link-success': '링크 복사됨',
+  'copy-link-unavailable': '링크를 사용할 수 없음',
   'add-task-success': '작업이 성공적으로 추가되었습니다',
   'remove-record': '기록 제거',
   'remove-record-confirm': '"{taskName}"의 기록을 제거하시겠습니까?',

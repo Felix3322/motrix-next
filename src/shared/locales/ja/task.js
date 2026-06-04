@@ -242,6 +242,7 @@ export default {
   'refresh-list-success': 'リストを更新しました',
   'copy-link': 'リンクをコピー',
   'copy-link-success': 'リンクをコピーしました',
+  'copy-link-unavailable': 'リンクを利用できません',
   'add-task-success': 'タスクを追加しました',
   'remove-record': '記録を削除',
   'remove-record-confirm': '「{taskName}」の記録を削除しますか？',

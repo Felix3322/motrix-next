@@ -491,6 +491,8 @@ mod tests {
             total_length: "1".to_string(),
             completed_length: "1".to_string(),
             info_hash: None,
+            magnet_link: None,
+            ed2k_link: None,
             is_bt: false,
             is_ed2k: false,
             sharing_kind: None,

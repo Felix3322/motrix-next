@@ -1,5 +1,5 @@
-/** @fileoverview Task metadata operations: naming, progress, BT detection, magnet links. */
-import { difference, parseInt } from 'lodash-es'
+/** @fileoverview Task metadata operations: naming, progress, task links, and open targets. */
+import { parseInt } from 'lodash-es'
 import { join } from '@tauri-apps/api/path'
 import type { Aria2Task, Aria2File } from '@shared/types'
 import { resolveTaskFilePath } from '@/composables/useArchivedPaths'
@@ -135,36 +135,19 @@ export const checkTaskIsEd2kSearch = (task: Partial<Aria2Task> = {} as Partial<A
   )
 }
 
-/** Builds a magnet link from a BT task, optionally including tracker URLs. */
-export const buildMagnetLink = (task: Aria2Task, withTracker = false, btTracker: string[] = []): string => {
-  const { bittorrent, infoHash } = task
-  const info = bittorrent?.info
-
-  const params = [`magnet:?xt=urn:btih:${infoHash}`]
-  if (info && info.name) {
-    params.push(`dn=${encodeURIComponent(info.name)}`)
-  }
-
-  if (withTracker && bittorrent?.announceList) {
-    const flatList = bittorrent.announceList.flat()
-    const trackers = difference(flatList, btTracker)
-    trackers.forEach((tracker) => {
-      params.push(`tr=${encodeURIComponent(tracker)}`)
-    })
-  }
-
-  return params.join('&')
-}
-
 /**
  * Collects all download URIs from a task.
- * For BT tasks, returns this magnet link.
+ * For BT and ED2K tasks, returns the engine-serialized canonical link.
  * For HTTP/FTP tasks, iterates all files and extracts their URIs.
  */
-export const getTaskUris = (task: Aria2Task, withTracker = false): string[] => {
-  if (checkTaskIsBT(task)) {
-    const magnet = buildMagnetLink(task, withTracker)
+export const getTaskUris = (task: Aria2Task, _withTracker = false): string[] => {
+  const magnet = task.bittorrent?.magnetLink?.trim()
+  if (magnet) {
     return magnet ? [magnet] : []
+  }
+  const ed2kLink = task.ed2k?.ed2kLink?.trim()
+  if (ed2kLink) {
+    return [ed2kLink]
   }
   const { files } = task
   if (!files || files.length === 0) return []
@@ -185,15 +168,16 @@ export const getTaskUris = (task: Aria2Task, withTracker = false): string[] => {
  * with ALL its mirrors in a single call, preserving multi-source semantics.
  *
  * - BT: single group containing the magnet link
+ * - ED2K: single group containing the file link
  * - HTTP/FTP: one group per file, each containing ALL mirror URIs
  *
  * Each group maps to one addUriAtomic({ uris: [...mirrors] }) call.
  */
-export const getRestartDescriptors = (task: Aria2Task, withTracker = false): string[][] => {
-  if (checkTaskIsBT(task)) {
-    const magnet = buildMagnetLink(task, withTracker)
-    return magnet ? [[magnet]] : []
-  }
+export const getRestartDescriptors = (task: Aria2Task, _withTracker = false): string[][] => {
+  const magnet = task.bittorrent?.magnetLink?.trim()
+  if (magnet) return [[magnet]]
+  const ed2kLink = task.ed2k?.ed2kLink?.trim()
+  if (ed2kLink) return [[ed2kLink]]
   const { files } = task
   if (!files || files.length === 0) return []
   const descriptors: string[][] = []

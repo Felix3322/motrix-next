@@ -241,6 +241,7 @@ export default {
   'refresh-list-success': 'รีเฟรชรายการแล้ว',
   'copy-link': 'คัดลอกลิงก์',
   'copy-link-success': 'คัดลอกลิงก์แล้ว',
+  'copy-link-unavailable': 'ลิงก์ไม่พร้อมใช้งาน',
   'add-task-success': 'เพิ่มงานสำเร็จ',
   'remove-record': 'ลบรายการ',
   'remove-record-confirm': 'ลบรายการ "{taskName}"?',

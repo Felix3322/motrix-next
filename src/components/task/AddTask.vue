@@ -667,6 +667,7 @@ function kindTagType(kind: string): 'info' | 'success' | 'warning' {
               <NFormItem :show-label="false" style="margin-bottom: 0">
                 <NInput
                   v-model:value="form.uris"
+                  class="uri-input"
                   type="textarea"
                   :rows="5"
                   :placeholder="t('task.uri-task-tips') || 'One URL per line'"
@@ -823,6 +824,11 @@ function kindTagType(kind: string): 'info' | 'success' | 'warning' {
  * URI textarea rows=5 ≈ 138px — keep both panes at same min-height. */
 .tab-pane-content {
   min-height: 150px;
+}
+
+.uri-input :deep(.n-input__textarea-el) {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ── Torrent panel ────────────────────────────────────────────────── */

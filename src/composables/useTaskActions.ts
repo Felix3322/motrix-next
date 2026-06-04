@@ -188,9 +188,19 @@ export function useTaskActions(deps: TaskActionsDeps) {
     })
   }
 
-  function handleCopyLink(task: Aria2Task) {
-    navigator.clipboard.writeText(getTaskUri(task))
-    message.success(t('task.copy-link-success'))
+  async function handleCopyLink(task: Aria2Task) {
+    const uri = getTaskUri(task).trim()
+    if (!uri) {
+      message.warning(t('task.copy-link-unavailable'))
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(uri)
+      message.success(t('task.copy-link-success'))
+    } catch (e) {
+      logger.warn('TaskView.copyLink', getErrorMessage(e))
+      message.error(t('task.copy-link-unavailable'))
+    }
   }
 
   function handleShowInfo(task: Aria2Task) {

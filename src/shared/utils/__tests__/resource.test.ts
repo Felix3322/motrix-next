@@ -39,17 +39,17 @@ describe('splitTaskLinks', () => {
   it('returns empty for empty input', () => {
     expect(splitTaskLinks('')).toEqual([])
   })
-  it('decodes thunder links within multiline input', () => {
+  it('keeps thunder links wrapped within multiline input', () => {
     const thunderLink = 'thunder://' + btoa('AAhttp://decoded.com/file.zipZZ')
     const result = splitTaskLinks(`http://normal.com\n${thunderLink}`)
     expect(result).toHaveLength(2)
     expect(result[0]).toBe('http://normal.com')
-    expect(result[1]).toBe('http://decoded.com/file.zip')
+    expect(result[1]).toBe(thunderLink)
   })
   it('keeps processing later links after a malformed thunder link', () => {
     const thunderLink = 'thunder://' + btoa('AAhttp://decoded.com/file.zipZZ')
     const result = splitTaskLinks(`thunder://not valid base64\n${thunderLink}\nhttp://normal.com/file.zip`)
-    expect(result).toEqual(['thunder://not valid base64', 'http://decoded.com/file.zip', 'http://normal.com/file.zip'])
+    expect(result).toEqual(['thunder://not valid base64', thunderLink, 'http://normal.com/file.zip'])
   })
 })
 
