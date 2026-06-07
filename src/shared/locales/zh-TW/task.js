@@ -100,6 +100,7 @@ export default {
   'error-network': '網路錯誤',
   'error-unfinished': '存在未完成的下載',
   'error-resume-failed': '伺服器不支援斷點續傳',
+  'error-disk-full-detail': '目標磁碟空間不足。此任務需要約 {required}，可用空間 {available}。請清理磁碟或變更下載目錄。',
   'error-disk-full': '磁碟空間不足',
   'error-piece-length': '分片長度與控制檔案不匹配',
   'error-duplicate-file': '正在下載相同的檔案',

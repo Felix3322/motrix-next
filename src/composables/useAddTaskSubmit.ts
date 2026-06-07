@@ -44,6 +44,7 @@ import {
 } from '@shared/utils/headerSanitize'
 import { summarizeHeaderForwarding } from '@shared/utils/externalInputDiagnostics'
 import { getErrorMessage } from '@shared/utils/errorMessage'
+import { checkTorrentDiskSpace, formatDiskSpaceError, isDiskSpaceError } from '@/composables/useDiskSpacePreflight'
 import { buildTaskProxyOptions, getDownloadProxy, type TaskProxyMode } from '@shared/utils/proxyPolicy'
 import { resolveUserAgentFromContext } from '@shared/utils/userAgentPolicy'
 
@@ -160,10 +161,11 @@ function summarizeSubmitHeaderForwarding(form: AddTaskForm, context?: ExternalDo
  * Classifies an error from task submission into a user-friendly category.
  * Pure function — fully testable.
  */
-export function classifySubmitError(err: unknown): 'engine-not-ready' | 'duplicate' | 'generic' {
+export function classifySubmitError(err: unknown): 'engine-not-ready' | 'duplicate' | 'disk-full' | 'generic' {
   const msg = getErrorMessage(err)
   if (msg.includes('not initialized') || !isEngineReady()) return 'engine-not-ready'
   if (/duplicate|already/i.test(msg)) return 'duplicate'
+  if (isDiskSpaceError(err)) return 'disk-full'
   return 'generic'
 }
 
@@ -175,10 +177,28 @@ export async function submitBatchItems(
   items: BatchItem[],
   options: Aria2EngineOptions,
   taskStore: ReturnType<typeof useTaskStore>,
+  t?: (key: string, params?: Record<string, unknown>) => string,
 ): Promise<number> {
   let failures = 0
+  const preflightFailedIds = new Set<string>()
+  if (t) {
+    for (const failure of await checkTorrentDiskSpace(items, options)) {
+      preflightFailedIds.add(failure.item.id)
+      failure.item.status = 'failed'
+      failure.item.error = formatDiskSpaceError(t, failure.requiredBytes, failure.availableBytes)
+      logger.warn(
+        'submitBatchItems.diskSpace',
+        `dir=${failure.dir} required=${failure.requiredBytes} available=${failure.availableBytes}`,
+      )
+    }
+  }
+
   for (const item of items) {
     if (item.kind === 'uri') continue
+    if (preflightFailedIds.has(item.id)) {
+      failures++
+      continue
+    }
     if (item.status !== 'pending' && item.status !== 'failed') continue
     try {
       if (item.kind === 'torrent') {
@@ -203,7 +223,7 @@ export async function submitBatchItems(
       logger.info('submitBatchItems', `${item.kind} submitted: ${item.displayName}`)
     } catch (e) {
       item.status = 'failed'
-      item.error = getErrorMessage(e)
+      item.error = t && isDiskSpaceError(e) ? t('task.error-disk-full') : getErrorMessage(e)
       logger.error('submitBatchItems', e)
       failures++
     }
@@ -370,7 +390,7 @@ export function useAddTaskSubmit({ form, onClose }: UseAddTaskSubmitOptions) {
       let manualResult: ManualUriSubmitResult = { submittedTaskNames: [], magnetGids: [], magnetFailures: [] }
 
       if (batch.length > 0) {
-        await submitBatchItems(batch, options, taskStore)
+        await submitBatchItems(batch, options, taskStore, t)
       }
       if (form.value.uris.trim()) {
         manualResult = await submitManualUris(
@@ -427,6 +447,8 @@ export function useAddTaskSubmit({ form, onClose }: UseAddTaskSubmitOptions) {
         message.error(t('app.engine-not-ready'), { closable: true })
       } else if (category === 'duplicate') {
         message.warning(errMsg, { closable: true })
+      } else if (category === 'disk-full') {
+        message.error(t('task.error-disk-full'), { closable: true })
       } else {
         message.error(errMsg, { closable: true })
       }

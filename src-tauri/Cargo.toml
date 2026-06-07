@@ -60,6 +60,7 @@ content_disposition = "0.4"
 rfc2047-decoder = "1.1"
 strip-ansi-escapes = "0.2.1"
 tempfile = "3"
+fs2 = "0.4"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = [

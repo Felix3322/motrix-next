@@ -9,6 +9,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ref } from 'vue'
+import { invoke } from '@tauri-apps/api/core'
 
 // ── Mock external dependencies ──────────────────────────────────────
 vi.mock('@tauri-apps/api/core', () => ({
@@ -390,6 +391,12 @@ describe('classifySubmitError', () => {
     expect(classifySubmitError(new Error('duplicate download detected'))).toBe('duplicate')
   })
 
+  it('returns disk-full for disk allocation failures', () => {
+    expect(
+      classifySubmitError(new Error('Failed to write into the file, cause: There is not enough space on the disk.')),
+    ).toBe('disk-full')
+  })
+
   it('returns generic for unknown errors', () => {
     expect(classifySubmitError(new Error('network timeout'))).toBe('generic')
   })
@@ -505,6 +512,34 @@ describe('submitBatchItems', () => {
 
     expect(failures).toBe(1)
     expect(items[0].error).toBe('Aria2 Next error [1]: Unsupported URI scheme')
+  })
+
+  it('skips addTorrent when disk-space preflight fails', async () => {
+    ;(invoke as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      path: '/dl',
+      checkedPath: '/dl',
+      availableBytes: 100,
+    })
+    const t = (key: string, params?: Record<string, unknown>) => `${key}:${params?.required}/${params?.available}`
+    const items: BatchItem[] = [
+      {
+        id: 'disk-full',
+        kind: 'torrent',
+        source: 'huge.torrent',
+        displayName: 'huge.torrent',
+        payload: 'b64',
+        status: 'pending',
+        selectedFileIndices: [1],
+        torrentMeta: { infoHash: 'abc', files: [{ idx: 1, path: 'huge.bin', length: 200 }] },
+      },
+    ]
+
+    const failures = await submitBatchItems(items, baseOptions, mockTaskStore, t)
+
+    expect(failures).toBe(1)
+    expect(mockTaskStore.addTorrent).not.toHaveBeenCalled()
+    expect(items[0].status).toBe('failed')
+    expect(items[0].error).toBe('task.error-disk-full-detail:200 B/100 B')
   })
 
   it('skips already submitted items', async () => {

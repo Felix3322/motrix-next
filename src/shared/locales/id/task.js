@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'Ruang disk tujuan tidak mencukupi. Tugas ini membutuhkan sekitar {required}; tersedia {available}. Kosongkan ruang atau ubah folder unduhan.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',

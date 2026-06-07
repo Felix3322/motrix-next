@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'No hay suficiente espacio en el disco de destino. Esta tarea necesita aproximadamente {required}; hay {available} disponibles. Libera espacio o cambia la carpeta de descargas.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',

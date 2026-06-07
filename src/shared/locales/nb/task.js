@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'Det er ikke nok plass på måldisken. Denne oppgaven trenger omtrent {required}; {available} er tilgjengelig. Frigjør plass eller endre nedlastingsmappe.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',

@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'Er is onvoldoende ruimte op de doelschijf. Deze taak heeft ongeveer {required} nodig; {available} is beschikbaar. Maak ruimte vrij of wijzig de downloadmap.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',
