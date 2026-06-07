@@ -25,6 +25,7 @@ import { isMagnetUri } from '@/composables/useMagnetFlow'
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
 import { logger } from '@shared/logger'
 import { getErrorMessage } from '@shared/utils/errorMessage'
+import { isDiskSpaceError } from '@/composables/useDiskSpacePreflight'
 import { normalizeProxyMode } from '@shared/utils/proxyPolicy'
 import { resolveUserVisibleDownloadDir } from '@shared/utils/userVisibleDirectory'
 import { findMatchingUserAgentRule, resolveUserAgent } from '@shared/utils/userAgentPolicy'
@@ -529,7 +530,7 @@ async function handleSubmit() {
     let manualResult: ManualUriSubmitResult = { submittedTaskNames: [], magnetGids: [], magnetFailures: [] }
 
     if (hasBatch.value) {
-      await submitBatchItems(batch.value, options, taskStore)
+      await submitBatchItems(batch.value, options, taskStore, t)
     }
     if (form.value.uris.trim()) {
       // User's custom path takes highest priority — skip classification when overridden
@@ -610,6 +611,8 @@ async function handleSubmit() {
       message.error(t('app.engine-not-ready'), { closable: true })
     } else if (category === 'duplicate') {
       message.warning(errMsg, { closable: true })
+    } else if (category === 'disk-full' || isDiskSpaceError(e)) {
+      message.error(t('task.error-disk-full'), { closable: true })
     } else {
       message.error(errMsg, { closable: true })
     }
@@ -692,6 +695,7 @@ function kindTagType(kind: string): 'info' | 'success' | 'warning' {
                   >
                     <div class="batch-item-main">
                       <NEllipsis :style="{ maxWidth: '400px', flex: 1 }">{{ item.displayName }}</NEllipsis>
+                      <span v-if="item.error" class="batch-item-error">{{ item.error }}</span>
                       <NSpace :size="4" align="center" :wrap="false">
                         <NTag :type="kindTagType(item.kind)" size="small" :bordered="false"> Torrent </NTag>
                         <NButton quaternary size="tiny" @click.stop="removeBatchItem(item)">✕</NButton>
@@ -934,6 +938,15 @@ function kindTagType(kind: string): 'info' | 'success' | 'warning' {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+.batch-item-error {
+  flex: 0 1 260px;
+  min-width: 0;
+  color: var(--m3-error);
+  font-size: var(--font-size-sm, 12px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Content crossfade (file detail switching) ────────────────────── */

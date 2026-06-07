@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'Auf dem Ziellaufwerk ist nicht genügend Speicherplatz vorhanden. Diese Aufgabe benötigt etwa {required}, verfügbar sind {available}. Bitte geben Sie Speicherplatz frei oder ändern Sie den Download-Ordner.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',

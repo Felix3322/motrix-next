@@ -1,9 +1,27 @@
 use crate::engine::{valid_aria2_log_level, DEFAULT_ARIA2_LOG_LEVEL};
 use crate::error::AppError;
+use serde::Serialize;
 use serde_json::Value;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tauri::AppHandle;
 use tauri::Manager;
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DiskSpaceInfo {
+    pub path: String,
+    pub checked_path: String,
+    pub available_bytes: u64,
+}
+
+fn nearest_existing_path(path: &Path) -> Option<PathBuf> {
+    if path.exists() {
+        return Some(path.to_path_buf());
+    }
+    path.ancestors()
+        .find(|ancestor| ancestor.exists())
+        .map(Path::to_path_buf)
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum ManagedLogFileKind {
@@ -502,6 +520,30 @@ mod export_tests {
             "notice"
         );
     }
+}
+
+/// Returns available disk space for the volume containing the requested path.
+///
+/// The download directory may not exist yet (aria2 can create it later), so the
+/// check walks up to the nearest existing ancestor before asking the OS for the
+/// free-space value. This keeps torrent preflight reliable for new subfolders
+/// while still reporting the user-requested path back to the frontend.
+#[tauri::command]
+pub fn get_available_disk_space(path: String) -> Result<DiskSpaceInfo, AppError> {
+    let requested = Path::new(&path);
+    let checked = nearest_existing_path(requested)
+        .ok_or_else(|| AppError::Io(format!("No existing ancestor for path: {path}")))?;
+    let available_bytes = fs2::available_space(&checked)
+        .map_err(|e| AppError::Io(format!("Failed to query available disk space: {e}")))?;
+    log::debug!(
+        "disk-space: path={path:?} checked_path={:?} available_bytes={available_bytes}",
+        checked
+    );
+    Ok(DiskSpaceInfo {
+        path,
+        checked_path: crate::engine::path_to_safe_string(&checked),
+        available_bytes,
+    })
 }
 
 /// Checks whether a file or directory exists at the given path.

@@ -100,6 +100,7 @@ export default {
   'error-network': '网络错误',
   'error-unfinished': '存在未完成的下载',
   'error-resume-failed': '服务器不支持断点续传',
+  'error-disk-full-detail': '目标磁盘空间不足。该任务需要约 {required}，可用空间 {available}。请清理磁盘或更改下载目录。',
   'error-disk-full': '磁盘空间不足',
   'error-piece-length': '分片长度与控制文件不匹配',
   'error-duplicate-file': '正在下载相同的文件',

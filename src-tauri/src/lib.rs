@@ -844,6 +844,7 @@ pub fn run() {
             commands::is_autostart_launch,
             commands::clear_log_file,
             commands::export_diagnostic_logs,
+            commands::get_available_disk_space,
             commands::check_path_exists,
             commands::check_path_is_dir,
             commands::read_local_file,

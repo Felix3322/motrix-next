@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'مساحة القرص الهدف غير كافية. تحتاج هذه المهمة إلى حوالي {required}، والمساحة المتاحة {available}. يرجى إخلاء مساحة أو تغيير مجلد التنزيل.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',
