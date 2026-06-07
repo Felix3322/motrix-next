@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'अधूरे downloads बचे हैं',
   'error-resume-failed': 'Server resume support नहीं करता',
+  'error-disk-full-detail': 'लक्षित डिस्क में पर्याप्त जगह नहीं है। इस कार्य को लगभग {required} चाहिए; {available} उपलब्ध है। जगह खाली करें या डाउनलोड फ़ोल्डर बदलें।',
   'error-disk-full': 'Disk space पर्याप्त नहीं है',
   'error-piece-length': 'Piece length control file से match नहीं करती',
   'error-duplicate-file': 'यह file पहले से download हो रही है',

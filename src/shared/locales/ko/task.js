@@ -100,6 +100,7 @@ export default {
   'error-network': '네트워크 오류',
   'error-unfinished': '완료되지 않은 다운로드가 있음',
   'error-resume-failed': '서버가 이어받기를 지원하지 않음',
+  'error-disk-full-detail': '대상 디스크 공간이 부족합니다. 이 작업에는 약 {required}이(가) 필요하며 사용 가능 공간은 {available}입니다. 공간을 확보하거나 다운로드 폴더를 변경하세요.',
   'error-disk-full': '디스크 공간 부족',
   'error-piece-length': '조각 길이가 제어 파일과 일치하지 않음',
   'error-duplicate-file': '동일한 파일을 다운로드 중',

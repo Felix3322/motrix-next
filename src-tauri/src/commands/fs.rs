@@ -1,9 +1,87 @@
 use crate::engine::{valid_aria2_log_level, DEFAULT_ARIA2_LOG_LEVEL};
 use crate::error::AppError;
+use serde::Serialize;
 use serde_json::Value;
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 use tauri::AppHandle;
 use tauri::Manager;
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExistingFileSize {
+    pub relative_path: String,
+    pub size_bytes: u64,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DiskSpaceInfo {
+    pub path: String,
+    pub checked_path: String,
+    pub available_bytes: u64,
+    pub existing_file_sizes: Vec<ExistingFileSize>,
+}
+
+fn nearest_existing_path(path: &Path) -> Option<PathBuf> {
+    if path.exists() {
+        return Some(path.to_path_buf());
+    }
+    path.ancestors()
+        .find(|ancestor| ancestor.exists())
+        .map(Path::to_path_buf)
+}
+
+fn absolute_requested_path(path: &Path) -> PathBuf {
+    if path.is_absolute() {
+        return path.to_path_buf();
+    }
+    std::env::current_dir()
+        .map(|cwd| cwd.join(path))
+        .unwrap_or_else(|_| path.to_path_buf())
+}
+
+fn safe_relative_download_path(path: &str) -> Option<PathBuf> {
+    let requested = Path::new(path);
+    if requested.is_absolute() {
+        return None;
+    }
+
+    let mut safe_path = PathBuf::new();
+    for component in requested.components() {
+        match component {
+            Component::Normal(segment) => safe_path.push(segment),
+            Component::CurDir => {}
+            Component::ParentDir | Component::RootDir | Component::Prefix(_) => return None,
+        }
+    }
+
+    if safe_path.as_os_str().is_empty() {
+        None
+    } else {
+        Some(safe_path)
+    }
+}
+
+fn existing_file_sizes(
+    base_path: &Path,
+    relative_paths: Option<Vec<String>>,
+) -> Vec<ExistingFileSize> {
+    let Some(relative_paths) = relative_paths else {
+        return Vec::new();
+    };
+
+    relative_paths
+        .into_iter()
+        .filter_map(|relative_path| {
+            let safe_path = safe_relative_download_path(&relative_path)?;
+            let size_bytes = std::fs::metadata(base_path.join(safe_path)).ok()?.len();
+            Some(ExistingFileSize {
+                relative_path,
+                size_bytes,
+            })
+        })
+        .collect()
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum ManagedLogFileKind {
@@ -502,6 +580,36 @@ mod export_tests {
             "notice"
         );
     }
+}
+
+/// Returns available disk space for the volume containing the requested path.
+///
+/// The download directory may not exist yet (aria2 can create it later), so the
+/// check walks up to the nearest existing ancestor before asking the OS for the
+/// free-space value. This keeps torrent preflight reliable for new subfolders
+/// while still reporting the user-requested path back to the frontend.
+#[tauri::command]
+pub fn get_available_disk_space(
+    path: String,
+    relative_paths: Option<Vec<String>>,
+) -> Result<DiskSpaceInfo, AppError> {
+    let requested = absolute_requested_path(Path::new(&path));
+    let checked = nearest_existing_path(&requested)
+        .ok_or_else(|| AppError::Io(format!("No existing ancestor for path: {path}")))?;
+    let available_bytes = fs2::available_space(&checked)
+        .map_err(|e| AppError::Io(format!("Failed to query available disk space: {e}")))?;
+    let existing_file_sizes = existing_file_sizes(&requested, relative_paths);
+    log::debug!(
+        "disk-space: path={path:?} checked_path={:?} available_bytes={available_bytes} existing_files={}",
+        checked,
+        existing_file_sizes.len()
+    );
+    Ok(DiskSpaceInfo {
+        path,
+        checked_path: crate::engine::path_to_safe_string(&checked),
+        available_bytes,
+        existing_file_sizes,
+    })
 }
 
 /// Checks whether a file or directory exists at the given path.

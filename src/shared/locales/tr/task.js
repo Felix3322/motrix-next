@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'Hedef diskte yeterli alan yok. Bu görev yaklaşık {required} gerektiriyor; kullanılabilir alan {available}. Alan açın veya indirme klasörünü değiştirin.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',
