@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'Ổ đĩa đích không đủ dung lượng. Tác vụ này cần khoảng {required}; hiện có {available}. Hãy giải phóng dung lượng hoặc đổi thư mục tải xuống.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',

@@ -100,6 +100,7 @@ export default {
   'error-network': 'Network error',
   'error-unfinished': 'Unfinished downloads remain',
   'error-resume-failed': 'Server does not support resume',
+  'error-disk-full-detail': 'Δεν υπάρχει αρκετός χώρος στον δίσκο προορισμού. Αυτή η εργασία χρειάζεται περίπου {required}, διαθέσιμα {available}. Ελευθερώστε χώρο ή αλλάξτε φάκελο λήψης.',
   'error-disk-full': 'Not enough disk space',
   'error-piece-length': 'Piece length mismatch with control file',
   'error-duplicate-file': 'Already downloading this file',

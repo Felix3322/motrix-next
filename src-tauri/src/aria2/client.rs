@@ -27,13 +27,23 @@ pub struct Aria2Client {
 pub struct Aria2State(pub Arc<Aria2Client>);
 
 impl Aria2Client {
+    fn build_http_client() -> reqwest::Client {
+        match reqwest::Client::builder().no_proxy().build() {
+            Ok(client) => client,
+            Err(error) => {
+                log::warn!("aria2 client: failed to build no-proxy HTTP client: {error}");
+                reqwest::Client::new()
+            }
+        }
+    }
+
     /// Creates a new client with default credentials.
     ///
     /// The `reqwest::Client` is reused across all requests for connection
     /// pooling.  Credentials can be updated later via `update_credentials`.
     pub fn new(port: u16, secret: String) -> Self {
         Self {
-            http: reqwest::Client::new(),
+            http: Self::build_http_client(),
             port: RwLock::new(port),
             secret: RwLock::new(secret),
             request_id: AtomicU64::new(1),
@@ -449,8 +459,16 @@ mod tests {
 
     #[tokio::test]
     async fn call_returns_aria2_error_on_connection_refused() {
-        // Use a port where nothing is listening
-        let client = Aria2Client::new(19999, String::new());
+        // Reserve an ephemeral port and release it immediately so the test
+        // does not depend on a hard-coded port being unused in CI.
+        let listener = std::net::TcpListener::bind("127.0.0.1:0")
+            .expect("ephemeral TCP port should be available");
+        let port = listener
+            .local_addr()
+            .expect("listener should expose local addr")
+            .port();
+        drop(listener);
+        let client = Aria2Client::new(port, String::new());
         let result = client.save_session().await;
 
         assert!(result.is_err());

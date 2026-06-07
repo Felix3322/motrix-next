@@ -100,6 +100,7 @@ export default {
   'error-network': 'ネットワークエラー',
   'error-unfinished': '未完了のダウンロードがあります',
   'error-resume-failed': 'サーバーがレジュームをサポートしていません',
+  'error-disk-full-detail': '保存先ディスクの空き容量が不足しています。このタスクには約 {required} が必要ですが、利用可能なのは {available} です。空き容量を増やすか、ダウンロード先を変更してください。',
   'error-disk-full': 'ディスク容量が不足しています',
   'error-piece-length': 'ピース長が制御ファイルと一致しません',
   'error-duplicate-file': '同じファイルをダウンロード中です',
